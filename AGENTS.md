@@ -1,5 +1,7 @@
 # Prody — Agent instructions (IDE + Antigravity)
 
+**Read [`INTEGRATION.md`](INTEGRATION.md) first** for full system context, run commands, and API contract.
+
 When the user asks to **ship**, **deploy**, or **run Prody** on this workspace:
 
 ## Security-first loop

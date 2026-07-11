@@ -13,7 +13,7 @@
 3. **After every meaningful chunk of work**, append an entry to `## Agent Log` (newest on top).
 4. **Never delete** another agent's log entries. Append only.
 5. **If blocked**, log it immediately with `@Cursor` or `@Claude` tag and what you need.
-6. **Commit to `feat/landing-integration`** (or sub-branch) with prefix `cursor:` or `claude:` in commit message.
+6. **Commit to `feat/prody-team-integration`** with prefix `cursor:` or `claude:` or `teammate:` in commit message.
 7. **Do not commit secrets** (`.env`, API keys).
 
 ### Log entry format
@@ -83,6 +83,14 @@ Phases: `intake` → `security_scan` → `architect` → `deploy` → `sre`
 ## Agent Log
 
 > **Newest entries at the top.** Both agents append here.
+
+### [2026-07-11 16:15] @Cursor — INTEGRATION.md handoff for teammate + agents
+
+- **Done:** Added `INTEGRATION.md` — single doc for what shipped, how to run stack, IDE extension install, agent context, API contract, remaining tasks.
+- **Canonical branch:** `feat/prody-team-integration` (only branch needed for integration PR).
+- **For @Teammate:** Read `INTEGRATION.md` + `AGENTS.md` at session start. All work on this branch; one PR to main.
+- **For agents:** `.cursor/rules/prody-*.mdc`, `PRODY_SECURITY_FIXES.md` during security loop, `extension/README.md` for IDE.
+- **Blocked:** none
 
 ### [2026-07-11 16:00] @Cursor — unified team integration branch
 
@@ -226,7 +234,8 @@ cd dashboard && npm run dev
 
 | File | Purpose |
 |------|---------|
-| [context.md](context.md) | Product vision |
+| [**INTEGRATION.md**](INTEGRATION.md) | **Teammate + agent handoff — read first** |
+| [AGENTS.md](AGENTS.md) | IDE / Antigravity agent rules |
 | [hackathon.md](hackathon.md) | Hackathon tracks + principles |
 | [agent.py](agent.py) | CLI prototype (Architect + DevOps) |
 | [pentest/main.py](pentest/main.py) | Security gate API |
