@@ -65,27 +65,27 @@ function sevClass(sev: string): string {
   return "sev-low";
 }
 
-function htmlForSnapshot(
-  s: SessionSnapshot,
-  imageUrl: string | null,
-  dashboardUrl: string
-): string {
-  const gate = s.gate?.status ?? "—";
-  const gateClass =
-    gate === "PASS"
-      ? "gate-pass"
-      : gate === "PASS_WITH_WARNINGS"
-        ? "gate-warn"
-        : gate === "FAIL" || gate === "ERROR"
-          ? "gate-fail"
-          : "gate-pending";
+/** CSS class for a gate pill given its raw verdict status. */
+function gateClass(status: string): string {
+  if (status === "PASS") return "gate-pass";
+  if (status === "PASS_WITH_WARNINGS") return "gate-warn";
+  if (status === "FAIL" || status === "ERROR") return "gate-fail";
+  return "gate-pending";
+}
 
-  const findingsHtml =
-    s.findings.length === 0
-      ? `<p class="muted">No open findings yet. Run <strong>Prody: Ship to Production</strong>.</p>`
-      : s.findings
-          .map(
-            (f) => `
+/** Compact PASS/WARN/FAIL/ERROR label for a raw verdict status. */
+function gateLabel(status: string | undefined): string {
+  if (!status) return "—";
+  if (status === "PASS_WITH_WARNINGS") return "WARN";
+  return status;
+}
+
+function findingsHtml(findings: SessionSnapshot["findings"], emptyText: string): string {
+  return findings.length === 0
+    ? `<p class="muted">${emptyText}</p>`
+    : findings
+        .map(
+          (f) => `
         <article class="finding ${sevClass(f.severity)}">
           <header>
             <span class="badge">${escapeHtml(f.severity)}</span>
@@ -95,18 +95,28 @@ function htmlForSnapshot(
           ${f.evidence ? `<pre>${escapeHtml(f.evidence)}</pre>` : ""}
           ${f.remediation ? `<p class="fix"><strong>Fix:</strong> ${escapeHtml(f.remediation)}</p>` : ""}
         </article>`
-          )
-          .join("");
+        )
+        .join("");
+}
 
-  const resolvedHtml =
-    s.resolvedFindings.length === 0
-      ? ""
-      : `<section>
-          <h3>Resolved since last scan</h3>
+function resolvedHtml(findings: SessionSnapshot["resolvedFindings"], heading: string): string {
+  return findings.length === 0
+    ? ""
+    : `<section>
+          <h3>${heading}</h3>
           <ul class="resolved">
-            ${s.resolvedFindings.map((f) => `<li>✅ ${escapeHtml(f.title)}</li>`).join("")}
+            ${findings.map((f) => `<li>✅ ${escapeHtml(f.title)}</li>`).join("")}
           </ul>
         </section>`;
+}
+
+function htmlForSnapshot(
+  s: SessionSnapshot,
+  imageUrl: string | null,
+  dashboardUrl: string
+): string {
+  const secGate = s.gate?.status ?? "—";
+  const fnGate = s.functionalGate?.status ?? "—";
 
   const approvalHtml = s.pendingApproval
     ? `<section class="approval">
@@ -120,9 +130,10 @@ function htmlForSnapshot(
       </section>`
     : "";
 
+  const blockedGateLabel = s.blockedBy === "functional" ? "Functional gate" : "Security gate";
   const blockedBanner = s.blocked
     ? `<div class="banner fail">
-        Security gate blocked deploy. Open <code>PRODY_SECURITY_FIXES.md</code> for your agent, implement fixes, then retry.
+        ${escapeHtml(blockedGateLabel)} blocked deploy. Open <code>PRODY_SECURITY_FIXES.md</code> for your agent, implement fixes, then retry.
         <div class="actions">
           <button onclick="openFixes()">Open fix guide</button>
           <button onclick="retry()">Retry after fixes</button>
@@ -175,15 +186,25 @@ function htmlForSnapshot(
   <div class="meta">
     <span class="pill">${escapeHtml(s.sessionId || "—")}</span>
     <span class="pill">Phase: ${escapeHtml(s.phase)}</span>
-    <span class="pill ${gateClass}">Gate: ${escapeHtml(gate)}</span>
+    <span class="pill ${gateClass(fnGate)}">Functional: ${escapeHtml(gateLabel(s.functionalGate?.status))}</span>
+    <span class="pill ${gateClass(secGate)}">Security: ${escapeHtml(gateLabel(s.gate?.status))}</span>
     ${s.readinessScore != null ? `<span class="pill">Readiness: ${s.readinessScore}/100</span>` : ""}
   </div>
   ${blockedBanner}
   ${deployHtml}
   ${approvalHtml}
-  ${resolvedHtml}
-  <h3>Open findings</h3>
-  ${findingsHtml}
+  ${resolvedHtml(s.resolvedFunctionalFindings, "Functional issues resolved since last scan")}
+  ${resolvedHtml(s.resolvedFindings, "Security issues resolved since last scan")}
+  <h3>Functional findings — does it work?</h3>
+  ${findingsHtml(
+    s.functionalFindings,
+    "No open functional findings yet. Run <strong>Prody: Ship to Production</strong>."
+  )}
+  <h3>Security findings</h3>
+  ${findingsHtml(
+    s.findings,
+    "No open security findings yet. Run <strong>Prody: Ship to Production</strong>."
+  )}
   <div class="actions">
     <button class="secondary" onclick="openDashboard()">Open web dashboard</button>
   </div>

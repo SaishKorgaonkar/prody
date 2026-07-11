@@ -6,10 +6,11 @@ real engineering team would, hands structured state between phases, and is robus
 by design — a failing phase is logged, deploy is gated on security, and a status
 is always produced.
 
-    intake -> security_scan -> architect -> [human approval] -> deploy -> sre
+    intake -> functional_gate -> security_scan -> architect -> [human approval] -> deploy -> sre
 
-Security is a hard gate: deploy is REFUSED on a FAIL/ERROR verdict (or if the
-pentest gate can't be reached — fail closed, never ship unscanned code).
+Functional and security are both hard gates: deploy is REFUSED on a FAIL/ERROR
+verdict from either (or if the pentest gate can't be reached — fail closed,
+never ship unverified or unscanned code).
 """
 import traceback
 from typing import Optional
@@ -49,7 +50,58 @@ def _phase_intake(session: Session) -> bool:
         return False
 
 
-# ---- phase 2: security_scan (the hard gate) ---------------------------
+# ---- phase 2: functional_gate (the other hard gate) --------------------
+def _phase_functional(session: Session) -> bool:
+    session.emit_phase_start("functional_gate", "Checking your app actually works")
+
+    def on_event(kind, data):
+        if kind == "progress":
+            session.emit(EventType.LOG, agent=Agent.FUNCTIONAL,
+                         message=f"Functional review in progress ({data.get('findings_count', 0)} issues found so far)…",
+                         data=data)
+
+    try:
+        scan_id = gate_client.start_functest(session.project_path)
+        session.metadata["functest_scan_id"] = scan_id
+        session.emit(EventType.AGENT_MESSAGE, agent=Agent.FUNCTIONAL,
+                     message="Running functional smoke tests on a private test copy of your app.",
+                     data={"scan_id": scan_id})
+        verdict = gate_client.poll_functest_until_functional(scan_id, on_event=on_event)
+    except gate_client.GateUnavailable as e:
+        session.emit(EventType.ERROR, agent=Agent.FUNCTIONAL,
+                     message=("Functional test service is offline, so I won't deploy an "
+                              "unverified app. Start the security gate on :8900 and retry."),
+                     data={"detail": str(e)})
+        return False
+
+    session.functional_gate = verdict
+    for f in verdict.get("findings", []):
+        session.emit(EventType.FINDING, agent=Agent.FUNCTIONAL,
+                     message=f.get("title", "Functional finding"), data=f)
+
+    status = verdict.get("status")
+    session.emit(EventType.GATE, agent=Agent.FUNCTIONAL,
+                 message=verdict.get("executive_summary")
+                 or f"Functional verdict: {status}",
+                 data={"status": status, "summary": verdict.get("summary"),
+                       "gate_type": "functional"})
+    session.emit_phase_done("functional_gate")
+
+    if status in ("FAIL", "ERROR"):
+        if status == "FAIL":
+            msg = ("Deployment blocked: your app doesn't work as expected, so I won't "
+                   "ship a broken app to production.")
+        else:  # ERROR — the test run couldn't complete, so we won't ship unverified.
+            msg = ("Deployment blocked: the functional review couldn't finish, so I won't "
+                   "ship code that hasn't been verified. "
+                   + (verdict.get("error") or ""))
+        session.emit(EventType.ERROR, agent=Agent.FUNCTIONAL, message=msg.strip(),
+                     data={"status": status})
+        return False
+    return True
+
+
+# ---- phase 3: security_scan (the hard gate) ---------------------------
 def _phase_security(session: Session) -> bool:
     session.emit_phase_start("security_scan", "Checking your app for security risks")
 
@@ -82,7 +134,8 @@ def _phase_security(session: Session) -> bool:
     session.emit(EventType.GATE, agent=Agent.SECURITY,
                  message=verdict.get("executive_summary")
                  or f"Security verdict: {status}",
-                 data={"status": status, "summary": verdict.get("summary")})
+                 data={"status": status, "summary": verdict.get("summary"),
+                       "gate_type": "security"})
     session.emit_phase_done("security_scan")
 
     if gate_client.is_blocking(verdict):
@@ -99,7 +152,7 @@ def _phase_security(session: Session) -> bool:
     return True
 
 
-# ---- phase 3: architect -----------------------------------------------
+# ---- phase 4: architect -----------------------------------------------
 def _phase_architect(session: Session) -> bool:
     session.emit_phase_start("architect", "Designing your production setup")
     if deploy_runner.is_available():
@@ -115,7 +168,7 @@ def _phase_architect(session: Session) -> bool:
     return True
 
 
-# ---- phase 4+5: deploy (MCP managed agent or legacy gcloud) -----------
+# ---- phase 5+6: deploy (MCP managed agent or legacy gcloud) -----------
 def _uses_managed_deploy(session: Session) -> bool:
     return bool(session.metadata.get("architect_interaction_id"))
 def _resolve_project_id(session: Session) -> Optional[str]:
@@ -189,7 +242,7 @@ def _phase_deploy(session: Session) -> bool:
     return False
 
 
-# ---- phase 6: sre ------------------------------------------------------
+# ---- phase 7: sre ------------------------------------------------------
 def _phase_sre(session: Session) -> None:
     session.emit_phase_start("sre", "Confirming production health")
     deploy_result = session.metadata.get("deploy_result", {})
@@ -225,6 +278,8 @@ def run_pipeline(session: Session) -> None:
                      data={"source": session.source})
 
         if not _phase_intake(session):
+            session.status = "error"
+        elif not _phase_functional(session):
             session.status = "error"
         elif not _phase_security(session):
             session.status = "error"

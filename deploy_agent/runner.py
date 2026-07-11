@@ -11,8 +11,10 @@ import re
 from pathlib import Path
 from typing import Callable, Optional
 
+from agents import devops as devops_agent
 from engine.events import Agent, EventType
 from engine.session import Session
+from tools import gcloud
 
 _DEPLOY_URL_RE = re.compile(
     r"https://[^\s\)\]\"'<>]+",
@@ -236,6 +238,28 @@ def run_deploy_phase(session: Session) -> bool:
         return False
 
     session.metadata["project_id"] = mcp_project
+
+    service_name = (
+        session.metadata.get("service_name")
+        or devops_agent.service_name_for(project_path)
+    )
+    region = session.metadata.get("region") or gcloud.DEFAULT_REGION
+
+    # Human-in-the-loop: deploys are a critical action (context.md — Human Approval).
+    # Mirrors the legacy gcloud path in engine/orchestrator.py::_phase_deploy — the
+    # managed-MCP path must gate on the same dashboard/IDE approval before it
+    # performs a real Cloud Run deployment.
+    approved = session.request_approval(
+        step_id="deploy",
+        description=(f"Ready to deploy '{service_name}' to Google Cloud Run "
+                     f"in project {mcp_project}. Approve to go live in production."),
+        data={"project_id": mcp_project, "service_name": service_name,
+              "region": region, "architecture": (session.architecture or {}).get("plan")},
+    )
+    if not approved:
+        session.emit(EventType.LOG, agent=Agent.DEVOPS,
+                     message="Deployment was not approved — nothing was changed in production.")
+        return False
 
     try:
         devops_tools = [*md.DEVOPS_TOOLS, *md.build_google_cloud_mcp_tools(mcp_project)]

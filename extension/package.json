@@ -1,7 +1,7 @@
 {
   "name": "prody-cloud-engineer",
   "displayName": "Prody — Cloud Engineer",
-  "description": "Security review, architecture approval, and GCP deploy from your IDE via the Prody engine.",
+  "description": "Functional + security review, architecture approval, and GCP deploy from your IDE via the Prody engine.",
   "version": "0.1.0",
   "publisher": "prody",
   "engines": {

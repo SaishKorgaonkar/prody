@@ -18,6 +18,8 @@ export function ApprovalPanel({
   const imageSrc = pending.image_url
     ? `${API_BASE}${pending.image_url}`
     : null;
+  const approveLabel =
+    pending.phase === "deploy" ? "Approve & deploy" : "Approve & continue";
 
   async function decide(approved: boolean) {
     setBusy(true);
@@ -32,7 +34,7 @@ export function ApprovalPanel({
   return (
     <div className="rounded-2xl border border-coral/30 bg-stone p-5 sm:p-6">
       <p className="font-mono-label text-[12px] uppercase text-coral">
-        Approval required
+        Approval required{pending.phase ? ` · ${pending.phase}` : ""}
       </p>
       <p className="mt-2 text-[15px] leading-relaxed text-ink">
         {pending.description}
@@ -54,7 +56,7 @@ export function ApprovalPanel({
           onClick={() => void decide(true)}
           className="rounded-full bg-enterprise-green px-5 py-2.5 text-[14px] font-medium text-white disabled:opacity-50"
         >
-          Approve & deploy
+          {approveLabel}
         </button>
         <button
           type="button"

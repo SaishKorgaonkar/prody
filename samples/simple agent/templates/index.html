@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Demo Guestbook</title>
+    <meta name="description" content="A simple guestbook to demonstrate deployment processes.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-blob"></div>
+    <div class="background-blob blob-2"></div>
+    <div class="container">
+        <header>
+            <h1>Deploy Demo</h1>
+            <p>Leave a mark on this deployment demo instance.</p>
+        </header>
+
+        <section class="glass-panel form-section">
+            <form id="message-form">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Jane Doe" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required placeholder="Hello from the deployment agent!" rows="3"></textarea>
+                </div>
+                <button type="submit" id="submit-btn">
+                    <span>Sign Guestbook</span>
+                    <div class="loader" id="submit-loader" style="display: none;"></div>
+                </button>
+            </form>
+        </section>
+
+        <section class="messages-section">
+            <h2>Recent Entries</h2>
+            <div id="messages-container" class="messages-container">
+                <div class="loader-container" id="messages-loader">
+                    <div class="loader"></div>
+                </div>
+                <!-- Messages will be injected here via JS -->
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

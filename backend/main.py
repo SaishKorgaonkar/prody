@@ -154,6 +154,7 @@ def session_report(session_id: str):
         **s.status_dict(),
         "source": s.source,
         "stack": s.stack,
+        "functional_gate": s.functional_gate,
         "gate": s.gate,
         "architecture": s.architecture,
         "sre_handoff": s.sre_handoff,

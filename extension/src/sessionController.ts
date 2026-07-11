@@ -1,10 +1,16 @@
 import * as vscode from "vscode";
 import { ProdyClient } from "./prodyClient";
 import { buildFixesMarkdown, diffFindings, parseFinding } from "./findingsReport";
-import type { GateVerdict, ProdyEvent, ProdyFinding, SessionSnapshot } from "./types";
+import type { GateType, GateVerdict, ProdyEvent, ProdyFinding, SessionSnapshot } from "./types";
 
 function findingKey(f: ProdyFinding): string {
   return `${f.id ?? ""}|${f.title}|${f.location ?? ""}`;
+}
+
+/** True when an event belongs to the functional gate ("does it work?"),
+ * as opposed to the security gate. */
+function isFunctional(event: ProdyEvent): boolean {
+  return event.agent === "functional";
 }
 
 export class SessionController {
@@ -12,6 +18,7 @@ export class SessionController {
   private unsubscribe: (() => void) | null = null;
   private snapshot: SessionSnapshot = emptySnapshot("");
   private previousFindings: ProdyFinding[] = [];
+  private previousFunctionalFindings: ProdyFinding[] = [];
   private previousSessionId: string | undefined;
   private onChange: (() => void) | null = null;
   private statusBar: vscode.StatusBarItem;
@@ -48,8 +55,9 @@ export class SessionController {
       throw new Error("Open a workspace folder first.");
     }
 
-    if (isRetry && this.snapshot.findings.length > 0) {
+    if (isRetry && (this.snapshot.findings.length > 0 || this.snapshot.functionalFindings.length > 0)) {
       this.previousFindings = [...this.snapshot.findings];
+      this.previousFunctionalFindings = [...this.snapshot.functionalFindings];
       this.previousSessionId = this.snapshot.sessionId;
     }
 
@@ -117,6 +125,23 @@ export class SessionController {
       if (typeof status.readiness_score === "number") {
         this.snapshot.readinessScore = status.readiness_score;
       }
+      // Fallback resync in case the SSE stream closed before the final
+      // gate/approval events were delivered — status always reflects the
+      // latest functional/security verdicts and any still-pending approval.
+      if (status.functional_gate_status && !this.snapshot.functionalGate) {
+        this.snapshot.functionalGate = { status: String(status.functional_gate_status) };
+      }
+      if (status.gate_status && !this.snapshot.gate) {
+        this.snapshot.gate = { status: String(status.gate_status) };
+      }
+      if (status.pending_approval && !this.snapshot.pendingApproval) {
+        const pa = status.pending_approval as Record<string, unknown>;
+        this.snapshot.pendingApproval = {
+          step_id: String(pa.step_id ?? "architecture"),
+          description: String(pa.description ?? "Approval required"),
+          image_url: (pa.image_url as string | null | undefined) ?? null,
+        };
+      }
       this.refreshUi();
     } catch {
       // engine may be offline
@@ -132,30 +157,56 @@ export class SessionController {
     switch (event.type) {
       case "finding": {
         const f = parseFinding(event.data);
-        if (f && !this.snapshot.findings.some((x) => findingKey(x) === findingKey(f))) {
-          this.snapshot.findings.push(f);
+        if (!f) {
+          break;
+        }
+        const bucket = isFunctional(event)
+          ? this.snapshot.functionalFindings
+          : this.snapshot.findings;
+        if (!bucket.some((x) => findingKey(x) === findingKey(f))) {
+          bucket.push(f);
         }
         break;
       }
       case "gate": {
-        this.snapshot.gate = {
+        const verdict: GateVerdict = {
           status: String(event.data?.status ?? "UNKNOWN"),
           summary: event.data?.summary as Record<string, number> | undefined,
           executive_summary: event.message,
         };
-        const { resolved, stillOpen } = diffFindings(
-          this.previousFindings,
-          this.snapshot.findings
-        );
-        this.snapshot.resolvedFindings = resolved;
-        if (this.previousFindings.length > 0) {
-          this.snapshot.findings = stillOpen;
+        // `data.gate_type` is the authoritative signal ("functional" |
+        // "security"); fall back to `agent` for older engine payloads.
+        const gateType = String(event.data?.gate_type ?? event.agent ?? "security");
+
+        if (gateType === "functional") {
+          this.snapshot.functionalGate = verdict;
+          const { resolved, stillOpen } = diffFindings(
+            this.previousFunctionalFindings,
+            this.snapshot.functionalFindings
+          );
+          this.snapshot.resolvedFunctionalFindings = resolved;
+          if (this.previousFunctionalFindings.length > 0) {
+            this.snapshot.functionalFindings = stillOpen;
+          }
+        } else {
+          this.snapshot.gate = verdict;
+          const { resolved, stillOpen } = diffFindings(
+            this.previousFindings,
+            this.snapshot.findings
+          );
+          this.snapshot.resolvedFindings = resolved;
+          if (this.previousFindings.length > 0) {
+            this.snapshot.findings = stillOpen;
+          }
         }
 
-        const blocking = ["FAIL", "ERROR"].includes(this.snapshot.gate.status);
-        this.snapshot.blocked = blocking;
+        const blocking = ["FAIL", "ERROR"].includes(verdict.status);
+        if (blocking) {
+          this.snapshot.blocked = true;
+          this.snapshot.blockedBy = gateType === "functional" ? "functional" : "security";
+        }
 
-        void this.writeFixesDoc(blocking);
+        void this.writeFixesDoc(blocking, gateType === "functional" ? "functional" : "security");
         break;
       }
       case "approval_required": {
@@ -199,7 +250,12 @@ export class SessionController {
       case "error":
         if (event.agent === "security") {
           this.snapshot.blocked = true;
-          void this.writeFixesDoc(true);
+          this.snapshot.blockedBy = "security";
+          void this.writeFixesDoc(true, "security");
+        } else if (event.agent === "functional") {
+          this.snapshot.blocked = true;
+          this.snapshot.blockedBy = "functional";
+          void this.writeFixesDoc(true, "functional");
         }
         break;
       default:
@@ -210,7 +266,7 @@ export class SessionController {
     this.refreshUi();
   }
 
-  private async writeFixesDoc(blocking: boolean) {
+  private async writeFixesDoc(blocking: boolean, gateType: GateType): Promise<void> {
     const folder = vscode.workspace.workspaceFolders?.[0];
     if (!folder) {
       return;
@@ -226,6 +282,9 @@ export class SessionController {
       gate: this.snapshot.gate,
       findings: this.snapshot.findings,
       resolvedFindings: this.snapshot.resolvedFindings,
+      functionalGate: this.snapshot.functionalGate,
+      functionalFindings: this.snapshot.functionalFindings,
+      resolvedFunctionalFindings: this.snapshot.resolvedFunctionalFindings,
       previousSessionId: this.previousSessionId,
     });
 
@@ -233,11 +292,14 @@ export class SessionController {
     this.snapshot.fixesDocPath = docPath.fsPath;
 
     if (blocking) {
+      const verdict =
+        gateType === "functional" ? this.snapshot.functionalGate?.status : this.snapshot.gate?.status;
+      const gateLabel = gateType === "functional" ? "functional gate" : "security gate";
       const open = "Open fix guide";
       const retry = "Retry after fixes";
       void vscode.window
         .showWarningMessage(
-          `Prody blocked deploy: security gate ${this.snapshot.gate?.status}. Fix issues in ${fileName}, then retry.`,
+          `Prody blocked deploy: ${gateLabel} ${verdict}. Fix issues in ${fileName}, then retry.`,
           open,
           retry
         )
@@ -248,10 +310,16 @@ export class SessionController {
             void vscode.commands.executeCommand("prody.retrySecurity");
           }
         });
-    } else if (this.snapshot.resolvedFindings.length > 0) {
-      void vscode.window.showInformationMessage(
-        `Prody: ${this.snapshot.resolvedFindings.length} issue(s) resolved since last scan. Continuing pipeline…`
-      );
+    } else {
+      const resolvedCount =
+        gateType === "functional"
+          ? this.snapshot.resolvedFunctionalFindings.length
+          : this.snapshot.resolvedFindings.length;
+      if (resolvedCount > 0) {
+        void vscode.window.showInformationMessage(
+          `Prody: ${resolvedCount} issue(s) resolved since last scan. Continuing pipeline…`
+        );
+      }
     }
   }
 
@@ -260,9 +328,13 @@ export class SessionController {
   }
 
   private refreshUi() {
-    const gate = this.snapshot.gate?.status;
+    const fnGate = this.snapshot.functionalGate?.status;
+    const secGate = this.snapshot.gate?.status;
+    const gateSummary = [fnGate ? `Fn ${fnGate}` : null, secGate ? `Sec ${secGate}` : null]
+      .filter(Boolean)
+      .join(" · ");
     const phase = this.snapshot.phase;
-    this.statusBar.text = `$(cloud) Prody: ${phase}${gate ? ` · ${gate}` : ""}`;
+    this.statusBar.text = `$(cloud) Prody: ${phase}${gateSummary ? ` · ${gateSummary}` : ""}`;
     this.statusBar.tooltip = this.snapshot.deployUrl
       ? `Deploy URL: ${this.snapshot.deployUrl}`
       : "Prody cloud engineer session";
@@ -279,6 +351,9 @@ function emptySnapshot(sessionId: string): SessionSnapshot {
     findings: [],
     resolvedFindings: [],
     gate: null,
+    functionalFindings: [],
+    resolvedFunctionalFindings: [],
+    functionalGate: null,
     logs: [],
     blocked: false,
   };

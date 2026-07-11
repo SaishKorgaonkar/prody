@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { SessionEvent } from "@/lib/types";
 
 const agentColors: Record<string, string> = {
+  functional: "text-violet-500",
   security: "text-coral",
   architect: "text-action-blue",
   devops: "text-enterprise-green",

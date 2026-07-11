@@ -50,6 +50,7 @@ class EventType:
 class Agent:
     ORCHESTRATOR = "orchestrator"
     INTAKE = "intake"
+    FUNCTIONAL = "functional"
     SECURITY = "security"
     ARCHITECT = "architect"
     DEVOPS = "devops"

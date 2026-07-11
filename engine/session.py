@@ -17,7 +17,7 @@ from typing import Optional
 from .events import Event, EventType, Agent
 
 # Ordered phases of the engagement (matches Interface Contract in TASKS.md).
-PHASES = ("intake", "security_scan", "architect", "deploy", "sre")
+PHASES = ("intake", "functional_gate", "security_scan", "architect", "deploy", "sre")
 
 # Statuses that mean "nothing more will change".
 TERMINAL_STATUSES = ("done", "error", "cancelled")
@@ -35,6 +35,7 @@ class Session:
 
     # Results surfaced to the dashboard.
     stack: Optional[dict] = None
+    functional_gate: Optional[dict] = None  # functest verdict payload
     gate: Optional[dict] = None      # pentest verdict payload
     architecture: Optional[dict] = None
     deploy_url: Optional[str] = None
@@ -140,6 +141,7 @@ class Session:
             "status": self.status,
             "readiness_score": self.readiness_score,
             "deploy_url": self.deploy_url,
+            "functional_gate_status": (self.functional_gate or {}).get("status"),
             "gate_status": (self.gate or {}).get("status"),
             "pending_approval": self.pending_approval,
             "events_count": len(self.events),

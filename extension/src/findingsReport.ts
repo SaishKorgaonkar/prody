@@ -13,92 +13,139 @@ export function diffFindings(
   return { resolved, stillOpen: current };
 }
 
+function findingsSection(
+  heading: string,
+  findings: ProdyFinding[],
+  emptyText: string
+): string[] {
+  const lines: string[] = ["", heading, ""];
+  if (findings.length === 0) {
+    lines.push(emptyText);
+    return lines;
+  }
+  for (const f of findings) {
+    const id = f.id || "F-???";
+    lines.push(`### ${id}: ${f.title}`, "");
+    lines.push(`- **Severity:** ${f.severity}`);
+    if (f.confidence) {
+      lines.push(`- **Confidence:** ${f.confidence}`);
+    }
+    if (f.cwe) {
+      lines.push(`- **CWE:** ${f.cwe}`);
+    }
+    if (f.location) {
+      lines.push(`- **Location:** \`${f.location}\``);
+    }
+    if (f.evidence) {
+      lines.push("", "**Evidence:**", "", "```", f.evidence.trim(), "```");
+    }
+    if (f.remediation) {
+      lines.push("", "**Suggested fix (implement this):**", "", f.remediation.trim());
+    } else {
+      lines.push(
+        "",
+        "**Suggested fix:** Review the evidence and apply secure coding best practices for this issue type."
+      );
+    }
+    lines.push("");
+  }
+  return lines;
+}
+
 export function buildFixesMarkdown(opts: {
   sessionId: string;
   projectPath: string;
   gate: GateVerdict | null;
   findings: ProdyFinding[];
   resolvedFindings: ProdyFinding[];
+  functionalGate?: GateVerdict | null;
+  functionalFindings?: ProdyFinding[];
+  resolvedFunctionalFindings?: ProdyFinding[];
   previousSessionId?: string;
 }): string {
-  const { sessionId, projectPath, gate, findings, resolvedFindings, previousSessionId } =
-    opts;
+  const {
+    sessionId,
+    projectPath,
+    gate,
+    findings,
+    resolvedFindings,
+    functionalGate = null,
+    functionalFindings = [],
+    resolvedFunctionalFindings = [],
+    previousSessionId,
+  } = opts;
   const status = gate?.status ?? "UNKNOWN";
+  const functionalStatus = functionalGate?.status ?? "UNKNOWN";
   const lines: string[] = [
-    "# Prody Security Review — Fix Guide",
+    "# Prody Review — Fix Guide",
     "",
     "> **For your coding agent:** Read this file and implement every fix listed under",
-    "> **Open issues**. Do not deploy or skip security items. After fixes, ask the",
-    "> user to run **Prody: Retry After Fixes** in VS Code / Cursor / Antigravity.",
+    "> **Open issues**. Do not deploy or skip functional or security items. After fixes,",
+    "> ask the user to run **Prody: Retry After Fixes** in VS Code / Cursor / Antigravity.",
     "",
     "## Session",
     "",
     `- **Session ID:** \`${sessionId}\``,
     `- **Project path:** \`${projectPath}\``,
-    `- **Gate verdict:** \`${status}\``,
+    `- **Functional gate verdict:** \`${functionalStatus}\``,
+    `- **Security gate verdict:** \`${status}\``,
   ];
 
   if (previousSessionId) {
     lines.push(`- **Previous session:** \`${previousSessionId}\``);
   }
 
+  if (functionalGate?.executive_summary) {
+    lines.push("", "## Functional summary", "", functionalGate.executive_summary);
+  }
+
   if (gate?.executive_summary) {
-    lines.push("", "## Summary", "", gate.executive_summary);
+    lines.push("", "## Security summary", "", gate.executive_summary);
+  }
+
+  if (resolvedFunctionalFindings.length > 0) {
+    lines.push("", "## Functional issues resolved since last review", "");
+    for (const f of resolvedFunctionalFindings) {
+      lines.push(`- ✅ **${f.title}** (${f.severity}) — ${f.location || "n/a"}`);
+    }
   }
 
   if (resolvedFindings.length > 0) {
-    lines.push("", "## Resolved since last review", "");
+    lines.push("", "## Security issues resolved since last review", "");
     for (const f of resolvedFindings) {
       lines.push(`- ✅ **${f.title}** (${f.severity}) — ${f.location || "n/a"}`);
     }
   }
 
-  lines.push("", "## Open issues (implement these fixes)", "");
+  lines.push(
+    ...findingsSection(
+      "## Open functional issues (does your app actually work?)",
+      functionalFindings,
+      "_No open functional findings in this scan._"
+    )
+  );
 
-  if (findings.length === 0) {
-    lines.push("_No open security findings in this scan._");
-  } else {
-    for (const f of findings) {
-      const id = f.id || "F-???";
-      lines.push(`### ${id}: ${f.title}`, "");
-      lines.push(`- **Severity:** ${f.severity}`);
-      if (f.confidence) {
-        lines.push(`- **Confidence:** ${f.confidence}`);
-      }
-      if (f.cwe) {
-        lines.push(`- **CWE:** ${f.cwe}`);
-      }
-      if (f.location) {
-        lines.push(`- **Location:** \`${f.location}\``);
-      }
-      if (f.evidence) {
-        lines.push("", "**Evidence:**", "", "```", f.evidence.trim(), "```");
-      }
-      if (f.remediation) {
-        lines.push("", "**Suggested fix (implement this):**", "", f.remediation.trim());
-      } else {
-        lines.push(
-          "",
-          "**Suggested fix:** Review the evidence and apply secure coding best practices for this issue type."
-        );
-      }
-      lines.push("");
-    }
-  }
+  lines.push(
+    ...findingsSection(
+      "## Open security issues (implement these fixes)",
+      findings,
+      "_No open security findings in this scan._"
+    )
+  );
 
   lines.push(
     "## Agent implementation checklist",
     "",
-    "- [ ] Fix every item under **Open issues**",
+    "- [ ] Fix every item under **Open functional issues** and **Open security issues**",
     "- [ ] Run the app locally and smoke-test affected paths",
     "- [ ] Do not introduce new hardcoded secrets or SQL injection",
     "- [ ] Tell the user to run **Prody: Retry After Fixes** when done",
     "",
-    "## If the gate still fails",
+    "## If a gate still fails",
     "",
     "1. Re-read any new findings in the Prody sidebar",
     "2. Update this file or regenerate it on the next scan",
-    "3. Retry until verdict is `PASS` or `PASS_WITH_WARNINGS`",
+    "3. Retry until both verdicts are `PASS` or `PASS_WITH_WARNINGS`",
     "",
     "---",
     "_Generated by Prody IDE extension. Engine must be running on port 8000._"

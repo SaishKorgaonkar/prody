@@ -85,3 +85,55 @@ def poll_until_verdict(scan_id: str, on_event: Optional[Callable] = None,
 def is_blocking(verdict: dict) -> bool:
     """A deploy is blocked on FAIL (and on ERROR — fail closed, no verdict = no deploy)."""
     return verdict.get("status") in ("FAIL", "ERROR")
+
+
+def start_functest(project_path: str, base_url: str = PENTEST_BASE_URL,
+                   timeout: float = 30.0) -> str:
+    """Kick off a functional-only test run; returns the scan_id. Raises
+    GateUnavailable if down. chain_pentest is False since the engine runs the
+    security gate itself as the next phase."""
+    payload = {"project_path": project_path, "chain_pentest": False}
+    try:
+        r = httpx.post(f"{base_url}/functest/start", json=payload, timeout=timeout)
+    except httpx.HTTPError as e:
+        raise GateUnavailable(f"pentest service unreachable at {base_url}: {e}") from e
+    if r.status_code >= 400:
+        raise GateUnavailable(f"functest start failed ({r.status_code}): {r.text}")
+    return r.json()["scan_id"]
+
+
+def poll_functest_until_functional(scan_id: str, on_event: Optional[Callable] = None,
+                                   base_url: str = PENTEST_BASE_URL,
+                                   timeout_s: int = GATE_TIMEOUT_S) -> dict:
+    """Poll the functest status until terminal or timeout, then read the gate
+    and return its `functional` verdict.
+
+    `on_event(kind, data)` is invoked with progress so the engine can forward
+    functional-test findings into its own SSE stream.
+    """
+    deadline = time.time() + timeout_s
+    seen_findings = 0
+    while time.time() < deadline:
+        try:
+            s = httpx.get(f"{base_url}/functest/{scan_id}/status", timeout=10).json()
+        except httpx.HTTPError:
+            time.sleep(GATE_POLL_INTERVAL_S)
+            continue
+
+        if on_event:
+            findings = s.get("findings_count", 0)
+            if findings > seen_findings:
+                on_event("progress", {"findings_count": findings,
+                                      "phase": s.get("phase")})
+                seen_findings = findings
+
+        if s.get("status") in ("done", "error", "cancelled"):
+            try:
+                r = httpx.get(f"{base_url}/functest/{scan_id}/gate", timeout=15)
+            except httpx.HTTPError as e:
+                raise GateUnavailable(f"functest gate read failed: {e}") from e
+            gate = r.json()
+            return gate.get("functional") or {"status": "ERROR", "error": "no functional verdict"}
+        time.sleep(GATE_POLL_INTERVAL_S)
+
+    return {"status": "ERROR", "error": "functional gate timed out", "scan_id": scan_id}

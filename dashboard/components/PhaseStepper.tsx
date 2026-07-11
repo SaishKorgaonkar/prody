@@ -2,7 +2,8 @@ import type { SessionPhase } from "@/lib/types";
 
 const phases: { id: SessionPhase; label: string }[] = [
   { id: "intake", label: "Intake" },
-  { id: "security_scan", label: "Security" },
+  { id: "functional_gate", label: "Functional check" },
+  { id: "security_scan", label: "Security review" },
   { id: "architect", label: "Architect" },
   { id: "deploy", label: "Deploy" },
   { id: "sre", label: "SRE" },
