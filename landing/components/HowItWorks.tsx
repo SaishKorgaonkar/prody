@@ -14,7 +14,8 @@ export function HowItWorks() {
     <Section id="how-it-works" variant="stone">
       <SectionHeading
         label="How it works"
-        title="From code to production in one flow"
+        title="Stuck? Here's how Prody unblocks you"
+        description="One flow from scan to live URL. You stay in the loop; we do the heavy lifting."
       />
 
       <div className="mt-12 divide-y divide-hairline rounded-2xl border border-hairline bg-canvas">

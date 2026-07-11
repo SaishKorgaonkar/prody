@@ -3,15 +3,15 @@ import { Section, SectionHeading } from "./ui";
 const pains = [
   {
     title: "Secure deployments",
-    body: "Exposed secrets, misconfigured APIs, and dependency vulnerabilities block production.",
+    body: "Secrets, bad configs, and vulnerable deps stop you right before launch.",
   },
   {
     title: "Infrastructure planning",
-    body: "Compute, networking, databases, and topology still require expertise most teams lack.",
+    body: "You shouldn't need a cloud architect just to pick compute, networking, and a database.",
   },
   {
     title: "Operating in production",
-    body: "Monitoring, scaling, and incident response remain manual, even after AI made building easy.",
+    body: "After deploy, monitoring and scaling still feel like a second job nobody signed up for.",
   },
 ];
 
@@ -19,9 +19,9 @@ export function Problem() {
   return (
     <Section variant="stone">
       <SectionHeading
-        label="The problem"
-        title="Building got easy. Operating didn't."
-        description="Developers, founders, and Indian SMEs can ship apps fast, but production still demands DevOps, SRE, and security teams they can't afford."
+        label="Sound familiar?"
+        title="You built it. Now you're stuck."
+        description="The code works on your machine. Production asks for security, infra, and someone to keep it running. That's where most teams get stuck, and where Prody steps in."
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">

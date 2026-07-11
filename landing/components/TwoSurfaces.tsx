@@ -1,3 +1,4 @@
+import { DASHBOARD_URL } from "@/lib/config";
 import { ButtonPrimary, ButtonSecondary, FilterChip, Section, SectionHeading } from "./ui";
 
 const surfaces = [
@@ -6,7 +7,7 @@ const surfaces = [
     chip: "IDE Extension",
     title: "Start in your editor",
     subtitle: "Cursor · VS Code · Antigravity",
-    body: "Say \"deploy this securely\" and Prody inspects your repo, fixes issues, and continues on the dashboard when you need full visibility.",
+    body: "Stuck mid-deploy? Prody reads your repo, flags issues, and picks up on the dashboard when you want the full picture.",
     bullets: ["Lives in your IDE workflow", "Reads your workspace context", "Same session on the web"],
     cta: "Connect Extension",
     ctaHref: "#extension",
@@ -19,7 +20,7 @@ const surfaces = [
     body: "Paste a repo URL or drop a zip. Prody runs security scans, plans infrastructure, deploys, and monitors, all in plain language.",
     bullets: ["No IDE required", "Live agent activity feed", "Production readiness score"],
     cta: "Open Dashboard",
-    ctaHref: "#dashboard",
+    ctaHref: DASHBOARD_URL,
   },
 ];
 
@@ -28,8 +29,8 @@ export function TwoSurfaces() {
     <Section id="surfaces" variant="white">
       <SectionHeading
         label="One engine, two surfaces"
-        title="Wherever you start, Prody takes over"
-        description="Submit a repo, describe your goal, approve when it matters. Prody handles the rest."
+        title="Stuck in the IDE or on the web? Prody meets you there."
+        description="Same help either way: submit your repo, say what you want, approve when it matters."
       />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-2">

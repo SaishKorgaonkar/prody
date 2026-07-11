@@ -1,53 +1,54 @@
-import { ButtonPrimary, ButtonSecondary } from "./ui";
+import { DASHBOARD_URL } from "@/lib/config";
 import { HeroVideoGlass } from "./HeroVideoGlass";
-
-const stats = [
-  { value: "5", label: "AI agents" },
-  { value: "2", label: "Ways to start" },
-  { value: "0", label: "Cloud consoles" },
-];
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-canvas">
-      <div className="relative flex min-h-[min(920px,92vh)] flex-col lg:flex-row lg:items-stretch">
-        <div className="hero-grid relative z-10 flex flex-col justify-center px-6 py-14 md:px-10 md:py-16 lg:w-[min(520px,42vw)] lg:shrink-0 lg:py-20 lg:pl-[max(1.5rem,calc((100vw-1280px)/2+1.5rem))] lg:pr-10 xl:pl-[max(2.5rem,calc((100vw-1280px)/2+2.5rem))]">
-          <p className="font-mono-label text-[13px] uppercase text-coral">
-            Autonomous AI cloud engineer
+    <section className="relative overflow-hidden bg-[#09090b]">
+      <div className="hero-dark-grid pointer-events-none absolute inset-0 opacity-50" />
+
+      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[58%] lg:block">
+        <HeroVideoGlass />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-14 sm:px-8 md:px-10 md:py-20 lg:px-16 lg:py-24">
+        <div className="flex min-h-[calc(100dvh-8.5rem)] max-w-[560px] flex-col justify-center">
+          <p className="font-mono-label text-[12px] uppercase text-coral sm:text-[13px]">
+            Introducing Prody
           </p>
 
-          <h1 className="mt-4 text-[56px] font-semibold leading-[1.02] tracking-[-2px] text-ink md:text-[80px] md:tracking-[-2.5px] xl:text-[92px]">
-            Prody
+          <h1 className="mt-4 text-[42px] font-semibold leading-[1.06] tracking-[-1.8px] sm:text-[56px] sm:tracking-[-2px] md:text-[64px] lg:text-[72px]">
+            <span className="text-white">Stuck here?</span>
+            <br />
+            <span className="text-white/40">Prody&apos;s here to help.</span>
           </h1>
 
-          <p className="mt-5 max-w-[440px] text-[20px] font-semibold leading-[1.2] tracking-[-0.35px] text-ink md:text-[24px]">
-            Your autonomous engineering team, from code to production.
+          <p className="mt-6 text-[18px] font-medium leading-[1.35] text-white/90 sm:text-[20px]">
+            From your last commit to a live app, without opening the cloud console.
           </p>
 
-          <p className="mt-4 max-w-[420px] text-[16px] leading-[1.6] text-ink-muted md:text-[17px]">
-            Deploy, secure, monitor, and scale from your IDE or a GitHub link.
-            Never open the cloud console.
+          <p className="mt-4 max-w-[480px] text-[15px] leading-[1.65] text-white/50 sm:text-[16px]">
+            You wrote the code. Prody handles security, deploy, and ops in plain
+            language, from your IDE or a GitHub link.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-5">
-            <ButtonPrimary href="#extension">Connect Extension</ButtonPrimary>
-            <ButtonSecondary href="#dashboard">Open Dashboard</ButtonSecondary>
-          </div>
-
-          <div className="mt-10 flex flex-wrap gap-8 border-t border-hairline pt-8 md:gap-12">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <p className="text-[28px] font-semibold leading-none tracking-[-0.5px] text-ink md:text-[32px]">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-[13px] text-ink-muted">{stat.label}</p>
-              </div>
-            ))}
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+            <a
+              href="#extension"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-3 text-[14px] font-medium text-[#09090b] transition-opacity hover:opacity-90 sm:w-auto"
+            >
+              Connect Extension
+            </a>
+            <a
+              href={DASHBOARD_URL}
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-[14px] font-medium text-white transition-colors hover:border-white/35 hover:bg-white/[0.08] sm:w-auto"
+            >
+              Open Dashboard
+            </a>
           </div>
         </div>
 
-        <div className="relative min-h-[420px] flex-1 lg:min-h-0">
-          <HeroVideoGlass />
+        <div className="relative mt-10 h-[280px] w-full sm:h-[320px] lg:hidden">
+          <HeroVideoGlass mobile />
         </div>
       </div>
     </section>

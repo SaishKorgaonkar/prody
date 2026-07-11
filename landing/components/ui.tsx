@@ -90,7 +90,7 @@ export function Section({
       id={id}
       className={`py-20 md:py-24 ${variant === "stone" ? "bg-stone" : "bg-canvas"} ${className}`}
     >
-      <div className="mx-auto max-w-[1280px] px-6 md:px-10 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-10 lg:px-16">
         {children}
       </div>
     </section>

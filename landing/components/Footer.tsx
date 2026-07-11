@@ -1,6 +1,8 @@
+import { DASHBOARD_URL } from "@/lib/config";
+
 const columns = [
   { title: "Product", links: [{ l: "How it works", h: "#how-it-works" }, { l: "Agents", h: "#agents" }, { l: "Capabilities", h: "#capabilities" }] },
-  { title: "Developers", links: [{ l: "Connect Extension", h: "#extension" }, { l: "Open Dashboard", h: "#dashboard" }, { l: "Why Prody", h: "#why-prody" }] },
+  { title: "Developers", links: [{ l: "Connect Extension", h: "#extension" }, { l: "Open Dashboard", h: DASHBOARD_URL }, { l: "Why Prody", h: "#why-prody" }] },
   { title: "Company", links: [{ l: "About", h: "#" }, { l: "Contact", h: "#" }] },
   { title: "Legal", links: [{ l: "Privacy", h: "#" }, { l: "Terms", h: "#" }] },
 ];
@@ -14,7 +16,7 @@ export function Footer() {
             Prody
           </p>
           <p className="mt-3 max-w-[400px] text-[15px] leading-[1.5] text-white/65">
-            The autonomous engineering layer between code and production.
+            The help layer between your code and production. Stuck? Start here.
           </p>
           <p className="mt-4 max-w-[400px] text-[12px] leading-[1.4] text-white/45">
             By using Prody you agree to our Privacy Policy and Terms of Service.

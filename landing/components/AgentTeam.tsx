@@ -13,8 +13,8 @@ export function AgentTeam() {
     <Section id="agents" variant="stone">
       <SectionHeading
         label="Agent team"
-        title="Five specialists. One Prody."
-        description="Each agent has a clear job, visible actions, and natural handoffs, like a real engineering team."
+        title="Five helpers when you're stuck"
+        description="Each agent handles one part of the last mile, so you're never alone in the cloud console."
       />
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

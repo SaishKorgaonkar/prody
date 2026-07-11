@@ -16,10 +16,12 @@ import { Footer } from "@/components/Footer";
 export default function Home() {
   return (
     <>
-      <AnnouncementBar />
-      <Nav />
-      <main>
+      <div className="bg-[#09090b]">
+        <AnnouncementBar dark />
+        <Nav dark />
         <Hero />
+      </div>
+      <main>
         <TrustLogos />
         <Problem />
         <UseCases />

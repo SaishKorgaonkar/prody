@@ -3,11 +3,11 @@ import { Section, SectionHeading } from "./ui";
 const audiences = [
   {
     title: "Solo developers",
-    body: "Ship side projects and SaaS without learning Kubernetes first.",
+    body: "Side project ready but deploy feels impossible? Prody helps you ship.",
   },
   {
     title: "Startup founders",
-    body: "Launch on launch day, without hiring a DevOps team.",
+    body: "Launch day pressure and no ops team? Prody has your back.",
   },
   {
     title: "Small businesses",
@@ -20,7 +20,7 @@ export function UseCases() {
     <Section variant="white">
       <SectionHeading
         label="Built for"
-        title="Anyone who builds, not everyone who operates"
+        title="If you've ever been stuck here, Prody is for you"
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">

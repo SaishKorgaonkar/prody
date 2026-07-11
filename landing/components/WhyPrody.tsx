@@ -28,8 +28,8 @@ export function WhyPrody() {
     <Section id="why-prody" variant="stone">
       <SectionHeading
         label="Why Prody"
-        title="Engineering work, not another dashboard"
-        description="Prody is an autonomous team that does the work: scans, plans, deploys, and operates, in language you actually understand."
+        title="Help when you need it, not another tool to learn"
+        description="Prody doesn't dump dashboards on you. It does the work, explains what happened, and asks before anything critical."
       />
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2">
