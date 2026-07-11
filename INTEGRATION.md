@@ -35,6 +35,7 @@ Give this file (and root `AGENTS.md`) to your coding agent at the start of every
 
 ```
 intake
+  → functional_gate (functest on :8900 — HARD GATE, blocks deploy on FAIL)
   → security_scan (pentest gate on :8900 — HARD GATE, blocks deploy on FAIL)
   → architect (Managed Agent + architecture.jpg if MCP available)
   → [human approval] (dashboard or IDE extension)
@@ -42,6 +43,8 @@ intake
   → sre (health check + handoff)
   → deploy URL + readiness score
 ```
+
+**Merged from `feat/pentest-agent`:** functional testing gate (`pentest/functest/`), dashboard `GatePanel` (Works? / Secure?), extension dual-gate fix loop.
 
 **Security fail loop (IDE):**
 

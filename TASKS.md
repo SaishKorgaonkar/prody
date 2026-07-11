@@ -51,15 +51,16 @@
 
 Both agents build against these shapes. **Update here if you change them.**
 
-### Pentest gate (exists — `pentest/main.py`)
+### Pentest + functest gate (exists — `pentest/main.py`)
 
 ```
-POST /scan/start     { project_path, target_url? }  → { scan_id }
-GET  /scan/{id}/gate                              → { verdict: PASS|PASS_WITH_WARNINGS|FAIL, ... }
-GET  /scan/{id}/stream                            → SSE events
+POST /scan/start       { project_path, target_url? }  → { scan_id }
+GET  /scan/{id}/gate                                → { status: PASS|PASS_WITH_WARNINGS|FAIL|ERROR, ... }
+POST /functest/start   { project_path, chain_pentest? }  → { scan_id }
+GET  /functest/{id}/gate                            → { functional: { status, ... }, security?: ... }
 ```
 
-Deploy/orchestrator **must refuse** deploy when `verdict == FAIL`.
+Deploy/orchestrator **must refuse** deploy when either gate verdict is `FAIL` or `ERROR`.
 
 ### Engine API (Claude builds — Cursor consumes)
 
@@ -67,10 +68,10 @@ Deploy/orchestrator **must refuse** deploy when `verdict == FAIL`.
 POST /api/session/start   { source: "ide"|"dashboard", repo_url?, project_path? }  → { session_id }
 GET  /api/session/{id}/events   → SSE: { type, agent, message, data? }
 POST /api/session/{id}/approve  { step_id }   → user approval gate
-GET  /api/session/{id}/status   → { phase, readiness_score?, deploy_url? }
+GET  /api/session/{id}/status   → { phase, readiness_score?, deploy_url?, functional_gate_status?, gate_status? }
 ```
 
-Phases: `intake` → `security_scan` → `architect` → `deploy` → `sre`
+Phases: `intake` → `functional_gate` → `security_scan` → `architect` → `deploy` → `sre`
 
 ### SRE handoff payload (DevOps → SRE)
 
@@ -83,6 +84,14 @@ Phases: `intake` → `security_scan` → `architect` → `deploy` → `sre`
 ## Agent Log
 
 > **Newest entries at the top.** Both agents append here.
+
+### [2026-07-11 16:25] @Cursor — merged feat/pentest-agent into team branch
+
+- **Done:** Fast-forward merged `origin/feat/pentest-agent` into `feat/prody-team-integration`. Brings functional testing gate, dashboard `GatePanel`, extension dual-gate loop, MCP deploy polish, sample apps.
+- **Fixed:** `engine/session.py` status endpoint now returns full gate verdict objects (not bare strings). Dashboard `getSessionStatus` catches network errors when engine is offline.
+- **Updated:** `INTEGRATION.md`, `TASKS.md` interface contracts for `functional_gate` phase.
+- **For @Teammate:** Work on `feat/prody-team-integration` only. Run pentest on `:8900` before engine sessions.
+- **Blocked:** none
 
 ### [2026-07-11 16:15] @Cursor — INTEGRATION.md handoff for teammate + agents
 

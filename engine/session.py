@@ -134,6 +134,19 @@ class Session:
         self._approval_gate.set()
 
     # ---- status snapshot ------------------------------------------------
+    @staticmethod
+    def _gate_verdict(gate: Optional[dict], gate_type: str) -> Optional[dict]:
+        if not gate:
+            return None
+        status = gate.get("status")
+        if not status:
+            return None
+        return {
+            "status": status,
+            "summary": gate.get("summary") or gate.get("executive_summary"),
+            "gate_type": gate_type,
+        }
+
     def status_dict(self) -> dict:
         return {
             "session_id": self.session_id,
@@ -141,8 +154,10 @@ class Session:
             "status": self.status,
             "readiness_score": self.readiness_score,
             "deploy_url": self.deploy_url,
-            "functional_gate_status": (self.functional_gate or {}).get("status"),
-            "gate_status": (self.gate or {}).get("status"),
+            "functional_gate_status": self._gate_verdict(
+                self.functional_gate, "functional"
+            ),
+            "gate_status": self._gate_verdict(self.gate, "security"),
             "pending_approval": self.pending_approval,
             "events_count": len(self.events),
         }

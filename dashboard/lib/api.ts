@@ -26,13 +26,17 @@ export async function startSession(
 export async function getSessionStatus(
   sessionId: string
 ): Promise<SessionStatus> {
-  const res = await fetch(`${API_BASE}/api/session/${sessionId}/status`);
+  try {
+    const res = await fetch(`${API_BASE}/api/session/${sessionId}/status`);
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return mockStatus(sessionId);
+    }
+
+    return res.json();
+  } catch {
     return mockStatus(sessionId);
   }
-
-  return res.json();
 }
 
 export function subscribeSessionEvents(
