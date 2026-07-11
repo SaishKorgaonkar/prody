@@ -113,6 +113,7 @@ if not LOGGER.handlers:
 
 _LOGGED_INTERACTION_STEPS = set()
 ACTIVE_APPLICATION_DIRECTORY = None
+DEPLOYMENT_RECORD = None
 
 def print_banner():
     print("=========================================")
@@ -257,6 +258,44 @@ def extract_project_id(text: str) -> str | None:
         text,
     )
     return matches[-1] if matches else None
+
+
+def record_deployment(
+    project_id: str,
+    region: str,
+    service_name: str,
+    service_uri: str,
+    revision: str = "",
+    rollback_revision: str = "",
+) -> str:
+    """Records a verified Cloud Run deployment as the workflow result."""
+    global DEPLOYMENT_RECORD
+    if not re.fullmatch(r"[a-z][a-z0-9-]{4,28}[a-z0-9]", project_id):
+        raise ValueError("Invalid GCP project ID.")
+    if not re.fullmatch(r"[a-z][a-z0-9-]{0,61}[a-z0-9]", service_name):
+        raise ValueError("Invalid Cloud Run service name.")
+    if not re.fullmatch(r"[a-z]+(?:-[a-z0-9]+)+[0-9]", region):
+        raise ValueError("Invalid Google Cloud region.")
+    if not service_uri.startswith("https://"):
+        raise ValueError("Cloud Run service URI must use HTTPS.")
+
+    DEPLOYMENT_RECORD = {
+        "project_id": project_id,
+        "region": region,
+        "service_name": service_name,
+        "service_uri": service_uri,
+        "revision": revision,
+        "rollback_revision": rollback_revision,
+        "recorded_at": int(time.time()),
+    }
+    LOGGER.info(
+        "deployment_recorded project_id=%s region=%s service_name=%s revision=%s",
+        project_id,
+        region,
+        service_name,
+        revision,
+    )
+    return json.dumps(DEPLOYMENT_RECORD, sort_keys=True)
 
 
 def extract_local_directory(text: str) -> str | None:
@@ -1050,6 +1089,31 @@ DEVOPS_TOOLS = [
             "required": ["project_id", "gcloud_commands"],
         },
     },
+    {
+        "type": "function",
+        "name": "record_deployment",
+        "description": (
+            "Records the verified Ready Cloud Run deployment as the final workflow "
+            "result. Call exactly once after get_service confirms readiness."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "project_id": {"type": "string"},
+                "region": {"type": "string"},
+                "service_name": {"type": "string"},
+                "service_uri": {"type": "string"},
+                "revision": {"type": "string"},
+                "rollback_revision": {"type": "string"},
+            },
+            "required": [
+                "project_id",
+                "region",
+                "service_name",
+                "service_uri",
+            ],
+        },
+    },
 ]
 
 
@@ -1203,7 +1267,8 @@ def run_managed_agent(
     return interaction
 
 def main():
-    global ACTIVE_APPLICATION_DIRECTORY
+    global ACTIVE_APPLICATION_DIRECTORY, DEPLOYMENT_RECORD
+    DEPLOYMENT_RECORD = None
 
     architect_instructions = (
         "You are a Cloud Architect specialized strictly in designing GCP cloud architectures. "
@@ -1274,7 +1339,9 @@ def main():
         "If required values such as project ID or application directory are missing, ask only for those values. "
         "Once all values are known, you MUST deploy by requesting the provided tools and must not claim success unless "
         "their results confirm success. Prefer Google Cloud MCP for every supported operation. "
-        "Your final response may only summarize tool results and deployed resource URLs."
+        "After get_service confirms that the service is Ready, you MUST call record_deployment "
+        "exactly once with the verified service metadata. Your final response may only summarize "
+        "tool results and deployed resource URLs."
     )
 
     architect_handlers = {
@@ -1287,6 +1354,7 @@ def main():
         "read_cloud_run_logs": read_cloud_run_logs,
         "build_application_image": build_application_image,
         "deploy_infrastructure": deploy_infrastructure,
+        "record_deployment": record_deployment,
     }
     
     # ── Phase 1: Cloud Architect (iAPI) ───────────────────────────────────
@@ -1362,6 +1430,7 @@ def main():
     # ── Phase 2: Senior DevOps Agent (iAPI) ───────────────────────────────
     print("--- Phase 2: Senior DevOps ---")
     devops_interaction_id = None
+    devops_history = []
 
     context = "\n".join(architect_history)
     mcp_project = (
@@ -1415,9 +1484,11 @@ def main():
         devops_interaction_id = response.id
         devops_environment_id = response.environment_id
         print(f"DevOps: {response.output_text}")
+        devops_history.append(f"DevOps: {response.output_text}")
 
-        while True:
+        while DEPLOYMENT_RECORD is None:
             user_input = get_input("User (DevOps Phase): ")
+            devops_history.append(f"User: {user_input}")
 
             detected_directory = extract_local_directory(user_input)
             interaction_input = user_input
@@ -1445,6 +1516,7 @@ def main():
             devops_interaction_id = response.id
             devops_environment_id = response.environment_id
             print(f"DevOps: {response.output_text}")
+            devops_history.append(f"DevOps: {response.output_text}")
 
     except SystemExit:
         raise
@@ -1453,6 +1525,15 @@ def main():
     except Exception as e:
         LOGGER.exception("devops_communication_failed")
         print(f"Error communicating with DevOps: {e}")
+        return
+
+    if DEPLOYMENT_RECORD is None:
+        print("Deployment did not complete because no verified service was recorded.")
+        return
+    print(
+        "\n[Orchestrator] Deployment complete: "
+        f"{DEPLOYMENT_RECORD['service_uri']}"
+    )
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+managed_agent.log*
+architecture.jpg
+arch_professional_test.jpg
+test_imagen-*.jpg

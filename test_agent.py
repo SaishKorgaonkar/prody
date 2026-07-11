@@ -26,6 +26,35 @@ class TestAgent(unittest.TestCase):
             message = f"deepmind-hack26blr-4264 {directory}"
             self.assertEqual(agent.extract_local_directory(message), directory)
 
+    def test_record_deployment_creates_structured_handoff(self):
+        old_record = agent.DEPLOYMENT_RECORD
+        try:
+            result = agent.record_deployment(
+                project_id="test-project-123",
+                region="us-central1",
+                service_name="sample-service",
+                service_uri="https://sample-service.example.run.app",
+                revision="sample-service-00002",
+                rollback_revision="sample-service-00001",
+            )
+
+            self.assertIn('"service_name": "sample-service"', result)
+            self.assertEqual(
+                agent.DEPLOYMENT_RECORD["rollback_revision"],
+                "sample-service-00001",
+            )
+        finally:
+            agent.DEPLOYMENT_RECORD = old_record
+
+    def test_record_deployment_rejects_non_https_uri(self):
+        with self.assertRaises(ValueError):
+            agent.record_deployment(
+                project_id="test-project-123",
+                region="us-central1",
+                service_name="sample-service",
+                service_uri="http://unsafe.example",
+            )
+
     def test_build_application_environment_copies_nested_files(self):
         with tempfile.TemporaryDirectory() as directory:
             os.makedirs(os.path.join(directory, "static"))
@@ -231,6 +260,54 @@ class TestAgent(unittest.TestCase):
              patch('agent.get_input', side_effect=SystemExit(0)):
             with self.assertRaises(SystemExit):
                 agent.main()
+
+    @patch.dict(
+        os.environ,
+        {"GOOGLE_CLOUD_MCP_PROJECT": "test-project-123"},
+    )
+    def test_main_stops_after_recorded_deployment(self):
+        calls = []
+
+        def managed_agent_side_effect(prompt, instructions, tools, handlers, **kwargs):
+            calls.append((prompt, instructions, tools))
+            if "Senior DevOps" in instructions:
+                agent.record_deployment(
+                    project_id="test-project-123",
+                    region="us-central1",
+                    service_name="sample-service",
+                    service_uri="https://sample-service.example.run.app",
+                )
+                output = "Deployment ready."
+            else:
+                output = "Please approve."
+            return SimpleNamespace(
+                id=f"interaction-{len(calls)}",
+                environment_id=f"environment-{len(calls)}",
+                output_text=output,
+            )
+
+        old_record = agent.DEPLOYMENT_RECORD
+        try:
+            with patch(
+                "agent.run_managed_agent",
+                side_effect=managed_agent_side_effect,
+            ), patch(
+                "agent.build_google_cloud_mcp_tools",
+                return_value=[],
+            ), patch(
+                "agent.get_input",
+                return_value="APPROVE",
+            ):
+                agent.main()
+
+            self.assertEqual(len(calls), 2)
+            self.assertIn("Senior DevOps", calls[1][1])
+            self.assertEqual(
+                agent.DEPLOYMENT_RECORD["service_name"],
+                "sample-service",
+            )
+        finally:
+            agent.DEPLOYMENT_RECORD = old_record
 
     @patch.dict(os.environ, {"GOOGLE_CLOUD_MCP_PROJECT": "control-project"})
     @patch('agent._gcloud_output', return_value="access-token")

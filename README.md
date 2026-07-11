@@ -61,7 +61,9 @@ Enable the required product APIs in the target project, including:
 gcloud services enable \
   run.googleapis.com \
   storage.googleapis.com \
-  cloudresourcemanager.googleapis.com
+  cloudresourcemanager.googleapis.com \
+  cloudbuild.googleapis.com \
+  artifactregistry.googleapis.com
 ```
 
 ## Configuration
@@ -82,11 +84,40 @@ If this variable is omitted, the application uses an explicitly mentioned projec
 
 ## Run
 
+Start the web upload experience:
+
+```bash
+python3.12 web_app.py
+```
+
+Then open `http://localhost:8080`. Drop a `.zip`, `.tar.gz`, or `.tgz`
+application archive into the uploader to inspect its stack, then select
+**Continue to architecture**. The website starts `./run.sh`, submits the
+temporary application directory at the first prompt, and streams the complete
+Architect and DevOps conversation into the in-page console. Enter `APPROVE`,
+project IDs, and other requested responses directly in that console. The
+workflow can also be stopped or run again from the page.
+
+The web controller is intended to run locally. Its managed-agent process
+inherits `GEMINI_API_KEY`, `GOOGLE_CLOUD_MCP_PROJECT`, Google Cloud CLI
+authentication, and the rest of the web server environment. Authenticate and
+export required variables before starting `web_app.py`. Uploaded source is
+extracted into an isolated temporary directory, is never executed by the web
+controller, and is removed when the controller exits.
+For safety, the controller binds to `127.0.0.1` by default because the page can
+operate your authenticated deployment agent. Set `WEB_HOST` only when you have
+placed the service behind appropriate authentication and network controls.
+
+Start the interactive managed-agent workflow:
+
 ```bash
 ./run.sh
 ```
 
-During the architecture phase, provide the absolute path to the application. Review the generated architecture and enter `APPROVE` to begin deployment.
+During the architecture phase, provide the absolute path to the application.
+Review the generated architecture and enter `APPROVE` to begin deployment.
+After Cloud Run reports Ready, the DevOps agent records the deployment URL and
+the workflow ends.
 
 Exit at any prompt with `exit`, `quit`, `q`, `bye`, `:q`, or `Ctrl+C`.
 
@@ -94,6 +125,7 @@ Exit at any prompt with `exit`, `quit`, `q`, `bye`, `:q`, or `Ctrl+C`.
 
 ```bash
 GEMINI_API_KEY=dummy python3.12 -m unittest -v test_agent.py
+python3.12 -m unittest -v test_web_app.py test_deployment_session.py
 ```
 
 ## Security

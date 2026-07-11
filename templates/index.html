@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Analyze and deploy an application to Google Cloud with managed AI agents.">
+    <title>Northstar — Deployment Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Northstar home">
+        <span class="brand-mark"><span></span></span>
+        <span>NORTHSTAR</span>
+      </a>
+      <div class="topbar-meta">
+        <span class="system-status"><i></i> Systems operational</span>
+        <button class="icon-button" type="button" aria-label="Open help">?</button>
+        <div class="avatar" aria-label="Signed in user">PV</div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <aside class="rail" aria-label="Deployment progress">
+        <p class="eyebrow">New deployment</p>
+        <ol class="steps">
+          <li class="active" data-step="1">
+            <span class="step-number">01</span>
+            <div><strong>Source</strong><small>Upload application</small></div>
+          </li>
+          <li data-step="2">
+            <span class="step-number">02</span>
+            <div><strong>Architecture</strong><small>Agent review</small></div>
+          </li>
+          <li data-step="3">
+            <span class="step-number">03</span>
+            <div><strong>Deploy</strong><small>Cloud resources</small></div>
+          </li>
+        </ol>
+
+        <div class="rail-note">
+          <div class="spark-icon">✦</div>
+          <p>Two specialized agents inspect your source, design the architecture, and deploy your service.</p>
+          <a href="#how-it-works">How it works <span>↗</span></a>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="hero">
+          <div>
+            <p class="eyebrow"><span>01</span> Application source</p>
+            <h1>Ship your app.<br><em>Skip the cloud maze.</em></h1>
+          </div>
+          <p class="hero-copy">Drop in your codebase. Our managed agents map the architecture, provision Google Cloud, and keep watch after launch.</p>
+        </div>
+
+        <div class="workspace">
+          <section class="upload-card" id="upload-card">
+            <div class="card-topline">
+              <div>
+                <span class="card-index">SOURCE / 01</span>
+                <h2>Upload your application</h2>
+              </div>
+              <span class="secure-pill">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3m-8 0h6m-8 0h10v9H7z"/></svg>
+                Secure transfer
+              </span>
+            </div>
+
+            <form id="upload-form" enctype="multipart/form-data">
+              <input id="file-input" name="application" type="file" accept=".zip,.tar.gz,.tgz,application/zip,application/gzip" hidden>
+              <label class="dropzone" id="dropzone" for="file-input" tabindex="0">
+                <span class="upload-glyph" aria-hidden="true">
+                  <svg viewBox="0 0 48 48"><path d="M24 33V13m0 0-8 8m8-8 8 8"/><path d="M12 29v7h24v-7"/></svg>
+                </span>
+                <strong>Drop your project archive here</strong>
+                <span>or <u>browse your computer</u></span>
+                <small>ZIP, TAR.GZ, or TGZ · up to 50 MB</small>
+              </label>
+
+              <div class="upload-progress" id="upload-progress" hidden>
+                <div class="file-icon">ZIP</div>
+                <div class="file-progress-copy">
+                  <div><strong id="progress-name"></strong><span id="progress-percent">0%</span></div>
+                  <div class="progress-track"><i id="progress-bar"></i></div>
+                  <small id="progress-label">Preparing secure upload…</small>
+                </div>
+                <button type="button" id="cancel-upload" aria-label="Cancel upload">×</button>
+              </div>
+            </form>
+
+            <div class="trust-row">
+              <span><i>✓</i> Encrypted in transit</span>
+              <span><i>✓</i> No source extraction to disk</span>
+              <span><i>✓</i> Automatic stack detection</span>
+            </div>
+          </section>
+
+          <aside class="context-card">
+            <span class="card-index">WHAT HAPPENS NEXT</span>
+            <h3>From archive to a live service.</h3>
+            <div class="context-flow">
+              <div>
+                <span>01</span>
+                <p><strong>Code scan</strong>Your framework and dependencies are identified.</p>
+              </div>
+              <div>
+                <span>02</span>
+                <p><strong>Architecture proposal</strong>A cloud architect designs the right GCP stack.</p>
+              </div>
+              <div>
+                <span>03</span>
+                <p><strong>You approve</strong>Nothing deploys until you review the plan.</p>
+              </div>
+            </div>
+            <div class="agent-badge">
+              <span class="agent-orbit"><i></i></span>
+              <div><strong>Managed by Gemini</strong><small>Antigravity agent online</small></div>
+            </div>
+          </aside>
+        </div>
+
+        <section class="analysis-card" id="analysis-card" hidden aria-live="polite">
+          <div class="analysis-header">
+            <div class="success-mark">✓</div>
+            <div>
+              <span class="card-index">ANALYSIS COMPLETE</span>
+              <h2 id="analysis-filename">Project ready</h2>
+            </div>
+            <button class="text-button" id="replace-file" type="button">Replace file</button>
+          </div>
+          <div class="analysis-grid">
+            <article>
+              <small>PRIMARY STACK</small>
+              <strong id="analysis-stack">—</strong>
+              <div class="tag-list" id="analysis-tags"></div>
+            </article>
+            <article>
+              <small>PROJECT SIZE</small>
+              <strong id="analysis-size">—</strong>
+              <span id="analysis-files">— files inspected</span>
+            </article>
+            <article>
+              <small>CODE MIX</small>
+              <div class="languages" id="analysis-languages"></div>
+            </article>
+          </div>
+          <div class="analysis-footer">
+            <p><span>✦</span><strong>Cloud Architect is ready.</strong> Next, the agent will propose a deployment architecture for your review.</p>
+            <button class="primary-button" id="continue-button" type="button">Continue to architecture <span>→</span></button>
+          </div>
+        </section>
+
+        <section class="architecture-card" id="architecture-card" hidden>
+          <div class="console-header">
+            <div>
+              <span class="card-index">LIVE AGENT WORKSPACE</span>
+              <h2>Managed deployment console</h2>
+              <p>Every Architect and DevOps message appears here. Reply whenever the workflow asks for approval or deployment configuration.</p>
+            </div>
+            <span class="run-status" id="run-status"><i></i><span>Starting</span></span>
+          </div>
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span><i></i><i></i><i></i></span>
+              <strong>northstar · managed-agent</strong>
+              <button id="clear-output" type="button">Clear view</button>
+            </div>
+            <pre id="deployment-output" tabindex="0" aria-label="Deployment agent output"></pre>
+            <form class="terminal-input" id="terminal-input-form">
+              <span>›</span>
+              <input id="terminal-input" type="text" maxlength="4096" autocomplete="off" placeholder="Type APPROVE, a project ID, email, or your response…" aria-label="Reply to deployment agent">
+              <button type="submit">Send ↵</button>
+            </form>
+          </div>
+          <div class="console-footer">
+            <p id="console-hint"><strong>Tip:</strong> Your uploaded project path is sent automatically at the first prompt.</p>
+            <div>
+              <button class="secondary-button danger" id="stop-deployment" type="button">Stop workflow</button>
+              <button class="secondary-button" id="retry-deployment" type="button" hidden>Run again</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="error-toast" id="error-toast" role="alert" hidden>
+          <span>!</span><p id="error-message"></p><button type="button" aria-label="Dismiss error">×</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
