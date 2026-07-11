@@ -1,6 +1,8 @@
 # Prody IDE Extension
 
-VS Code / **Cursor** / **Antigravity** extension — security review loop, agent-ready fix guide, architecture approval, deploy URL.
+**One extension** for VS Code, **Cursor**, and **Antigravity** (all VS Code–compatible).
+
+→ **Cursor quick start:** [../cursor/README.md](../cursor/README.md)
 
 ## Prerequisites
 
@@ -20,15 +22,17 @@ npm install
 npm run compile
 ```
 
-Then in VS Code / Cursor:
+Then in VS Code / Cursor / Antigravity:
 
-1. **Run Extension** — open `extension/` folder, press F5, or use **Extensions: Install from VSIX** after `npm run package`.
+1. **Run Extension** — open the `extension/` folder, press **F5** (see [cursor/README.md](../cursor/README.md) for Cursor)
+2. Or **Install from VSIX** after `npx @vscode/vsce package --allow-missing-repository`
 
 Or from repo root:
 
 ```bash
 cd extension && npm install && npm run compile
-code --install-extension extension/prody-cloud-engineer-0.1.0.vsix
+cursor --install-extension extension/prody-cloud-engineer-0.1.0.vsix   # Cursor
+code --install-extension extension/prody-cloud-engineer-0.1.0.vsix   # VS Code
 ```
 
 ## Commands
