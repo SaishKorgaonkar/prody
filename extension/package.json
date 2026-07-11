@@ -1,0 +1,107 @@
+{
+  "name": "prody-cloud-engineer",
+  "displayName": "Prody — Cloud Engineer",
+  "description": "Security review, architecture approval, and GCP deploy from your IDE via the Prody engine.",
+  "version": "0.1.0",
+  "publisher": "prody",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:prody.session",
+    "onCommand:prody.shipToProduction",
+    "onCommand:prody.retrySecurity"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "prody.shipToProduction",
+        "title": "Prody: Ship to Production",
+        "category": "Prody",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "prody.retrySecurity",
+        "title": "Prody: Retry After Fixes",
+        "category": "Prody",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "prody.approve",
+        "title": "Prody: Approve & Deploy",
+        "category": "Prody",
+        "icon": "$(check)"
+      },
+      {
+        "command": "prody.reject",
+        "title": "Prody: Reject Plan",
+        "category": "Prody",
+        "icon": "$(close)"
+      },
+      {
+        "command": "prody.openFixesDoc",
+        "title": "Prody: Open Security Fixes Guide",
+        "category": "Prody",
+        "icon": "$(book)"
+      },
+      {
+        "command": "prody.openDashboard",
+        "title": "Prody: Open Web Dashboard",
+        "category": "Prody",
+        "icon": "$(globe)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "prody",
+          "title": "Prody",
+          "icon": "media/prody.svg"
+        }
+      ]
+    },
+    "views": {
+      "prody": [
+        {
+          "type": "webview",
+          "id": "prody.session",
+          "name": "Session"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Prody",
+      "properties": {
+        "prody.engineUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8000",
+          "description": "Prody engine API base URL"
+        },
+        "prody.dashboardUrl": {
+          "type": "string",
+          "default": "http://localhost:3001",
+          "description": "Prody web dashboard URL"
+        },
+        "prody.fixesFileName": {
+          "type": "string",
+          "default": "PRODY_SECURITY_FIXES.md",
+          "description": "Markdown file written to workspace when security issues need fixes"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}

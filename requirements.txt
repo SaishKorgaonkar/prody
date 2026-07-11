@@ -1,9 +1,14 @@
-# Deploy agent (Managed Agents / Google Cloud MCP)
+# Prody — merged engine + backend + pentest dependencies.
+# Install:  pip install -r requirements.txt
+
+# --- LLM / agents (Gemini Managed Agents / Interactions API) ---
 google-genai>=2.11.0
 
-# Pre-deploy security gate — the functest + pentest FastAPI service the deploy
-# agent consults before shipping (pentest/main.py).
+# --- Backend API + SSE (engine :8000, pentest :8900) ---
 fastapi
 uvicorn[standard]
+pydantic>=2
+
+# --- HTTP client (gate calls, SRE health checks) + parsing ---
 httpx
 beautifulsoup4

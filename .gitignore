@@ -16,5 +16,28 @@ venv/
 managed_agent.log
 architecture.jpg
 
+# Managed-agent session artifacts (architecture diagrams)
+artifacts/
+deploy_agent/managed_agent.log
+
 # Env / secrets
 .env
+.env.*
+
+# Node / Next.js (landing + dashboard)
+node_modules/
+landing/.next/
+landing/out/
+landing/.vercel/
+dashboard/.next/
+dashboard/out/
+dashboard/.vercel/
+*.tsbuildinfo
+
+# VS Code extension build
+extension/out/
+extension/*.vsix
+
+# OS / editor
+.DS_Store
+Thumbs.db
