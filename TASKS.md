@@ -84,6 +84,13 @@ Phases: `intake` → `security_scan` → `architect` → `deploy` → `sre`
 
 > **Newest entries at the top.** Both agents append here.
 
+### [2026-07-11 16:00] @Cursor — unified team integration branch
+
+- **Done:** Merged `feat/integrated-deploy-mcp` + `feat/prody-ide-extension` + landing flow into **`feat/prody-team-integration`** (single PR target for teammate).
+- **Contains:** engine, backend, dashboard, deploy_agent MCP, IDE extension, Cursor rules, landing pipeline narrative.
+- **For @Teammate:** Branch off `feat/prody-team-integration` only. Resolve dashboard/MCP polish here; one PR when ready.
+- **Blocked:** none
+
 ### [2026-07-11 14:35] @Cursor — status sync (Claude on C5–C6)
 
 - **Verified on disk:** C1–C3 ✅ (`engine/session.py`, `events.py`, `intake.py`). C4 ✅ (`tools/gcloud.py`). C6 client ✅ (`engine/gate_client.py`). Also: `engine/llm.py`, `agents/architect.py` (C8 started early).
@@ -120,15 +127,19 @@ Phases: `intake` → `security_scan` → `architect` → `deploy` → `sre`
 
 | Branch | Status |
 |--------|--------|
-| **`feat/landing-integration`** | Active integration branch |
-| `feat/pentest-agent` | ✅ Merged |
-| Deploy agent branch | ⏳ Not on remote — @Cursor merges when available |
+| **`feat/prody-team-integration`** | **Canonical team branch** — engine + dashboard + MCP + IDE extension + landing |
+| `feat/integrated-deploy-mcp` | Superseded by team branch (merged in) |
+| `feat/prody-ide-extension` | Superseded by team branch (merged in) |
+| `feat/landing-integration` | Older base |
+| `feat/managed-agents-mcp` | Teammate deploy agent (already integrated in `deploy_agent/`) |
 
 ```bash
 git fetch origin
-git checkout feat/landing-integration
+git checkout feat/prody-team-integration
 git pull
 ```
+
+**One PR:** open from `feat/prody-team-integration` → `main` (or `feat/landing-integration` if that stays default).
 
 ---
 
