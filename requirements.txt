@@ -1,1 +1,9 @@
-google-genai
+# Deploy agent (Managed Agents / Google Cloud MCP)
+google-genai>=2.11.0
+
+# Pre-deploy security gate — the functest + pentest FastAPI service the deploy
+# agent consults before shipping (pentest/main.py).
+fastapi
+uvicorn[standard]
+httpx
+beautifulsoup4

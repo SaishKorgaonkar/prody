@@ -11,5 +11,10 @@ venv/
 .pentest_venv/
 *.db
 
+# Deploy agent runtime artifacts
+*.log
+managed_agent.log
+architecture.jpg
+
 # Env / secrets
 .env
