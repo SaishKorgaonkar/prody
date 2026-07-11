@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --primary-near-black: #17171c;
+  --enterprise-green: #003c33;
+  --action-blue: #1863dc;
+  --coral: #ff7759;
+  --canvas-white: #ffffff;
+  --soft-stone: #eeece7;
+  --ink: #212121;
+  --ink-muted: #93939f;
+  --hairline: #d9d9dd;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas-white);
+  --color-stone: var(--soft-stone);
+  --color-primary: var(--primary-near-black);
+  --color-enterprise-green: var(--enterprise-green);
+  --color-action-blue: var(--action-blue);
+  --color-coral: var(--coral);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-hairline: var(--hairline);
+  --font-sans: var(--hashicorp-sans);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--canvas-white);
+  color: var(--ink);
+  font-family: var(--hashicorp-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", helvetica, arial, sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.font-mono-label {
+  font-family: var(--hashicorp-sans), sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+}
+
+.font-display {
+  font-family: var(--hashicorp-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", helvetica, arial, sans-serif;
+  font-weight: 600;
+}
+
+.hero-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(33, 33, 33, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 28px 28px;
+}
+
+.hero-visual-grid {
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 18%,
+    black 100%
+  );
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--hashicorp-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", helvetica, arial, sans-serif;
+  font-weight: 600;
+}

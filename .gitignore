@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Pentest runtime artifacts
+.pentest_gate.json
+.pentest_venv/
+*.db
+
+# Env / secrets
+.env
+.env.*
+
+# Node / Next.js (landing)
+node_modules/
+landing/.next/
+landing/out/
+landing/.vercel/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
