@@ -28,6 +28,10 @@ dashboard/out/
 dashboard/.vercel/
 *.tsbuildinfo
 
+# VS Code extension build
+extension/out/
+extension/*.vsix
+
 # OS / editor
 .DS_Store
 Thumbs.db
