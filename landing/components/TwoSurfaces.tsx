@@ -7,8 +7,12 @@ const surfaces = [
     chip: "IDE Extension",
     title: "Start in your editor",
     subtitle: "Cursor · VS Code · Antigravity",
-    body: "Stuck mid-deploy? Prody reads your repo, flags issues, and picks up on the dashboard when you want the full picture.",
-    bullets: ["Lives in your IDE workflow", "Reads your workspace context", "Same session on the web"],
+    body: "Run Prody from the command palette. Security findings appear in the sidebar; fix guides land in your repo for your agent to implement.",
+    bullets: [
+      "Security loop: scan → fix guide → retry",
+      "Same session continues on the web dashboard",
+      "Approve architecture without leaving the IDE",
+    ],
     cta: "Connect Extension",
     ctaHref: "#extension",
   },
@@ -16,9 +20,13 @@ const surfaces = [
     id: "dashboard",
     chip: "Web Dashboard",
     title: "Start with a GitHub link",
-    subtitle: "GitHub · Drag & drop",
-    body: "Paste a repo URL or drop a zip. Prody runs security scans, plans infrastructure, deploys, and monitors, all in plain language.",
-    bullets: ["No IDE required", "Live agent activity feed", "Production readiness score"],
+    subtitle: "GitHub · Local path",
+    body: "Paste a repo or project path and watch the agent team work live: security, plan, approval gate, deploy URL.",
+    bullets: [
+      "Live SSE event stream per session",
+      "Architecture approval with diagram",
+      "Production readiness score + live URL",
+    ],
     cta: "Open Dashboard",
     ctaHref: DASHBOARD_URL,
   },
@@ -28,9 +36,9 @@ export function TwoSurfaces() {
   return (
     <Section id="surfaces" variant="white">
       <SectionHeading
-        label="One engine, two surfaces"
-        title="Stuck in the IDE or on the web? Prody meets you there."
-        description="Same help either way: submit your repo, say what you want, approve when it matters."
+        label="Where to start"
+        title="Pick your entry point"
+        description="One engine powers both surfaces. The pipeline is identical either way."
       />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-2">
@@ -40,7 +48,7 @@ export function TwoSurfaces() {
             id={s.id}
             className="rounded-2xl border border-hairline bg-stone p-8 md:p-10"
           >
-            <FilterChip active={s.id === "extension"}>{s.chip}</FilterChip>
+            <FilterChip active={s.id === "dashboard"}>{s.chip}</FilterChip>
             <h3 className="font-display mt-5 text-[28px] leading-[1.2] tracking-[-0.32px] text-ink md:text-[32px]">
               {s.title}
             </h3>
@@ -55,7 +63,7 @@ export function TwoSurfaces() {
             </ul>
             <div className="mt-8 flex flex-wrap items-center gap-6">
               <ButtonPrimary href={s.ctaHref}>{s.cta}</ButtonPrimary>
-              <ButtonSecondary href="#how-it-works">Learn more</ButtonSecondary>
+              <ButtonSecondary href="#how-it-works">See the pipeline</ButtonSecondary>
             </div>
           </div>
         ))}

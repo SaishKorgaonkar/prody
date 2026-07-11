@@ -2,16 +2,16 @@ import { Section, SectionHeading } from "./ui";
 
 const pains = [
   {
-    title: "Secure deployments",
-    body: "Secrets, bad configs, and vulnerable deps stop you right before launch.",
+    title: "Security before deploy",
+    body: "Shipping without a scan is how secrets and vulns reach production. Prody gates deploy on a real review.",
   },
   {
-    title: "Infrastructure planning",
-    body: "You shouldn't need a cloud architect just to pick compute, networking, and a database.",
+    title: "Architecture without a degree",
+    body: "Cloud Run, IAM, networking — Prody designs it, shows you a diagram, and waits for approval.",
   },
   {
-    title: "Operating in production",
-    body: "After deploy, monitoring and scaling still feel like a second job nobody signed up for.",
+    title: "Ops after go-live",
+    body: "A live URL is not the finish line. SRE watches health and explains readiness in plain language.",
   },
 ];
 
@@ -19,9 +19,9 @@ export function Problem() {
   return (
     <Section variant="stone">
       <SectionHeading
-        label="Sound familiar?"
-        title="You built it. Now you're stuck."
-        description="The code works on your machine. Production asks for security, infra, and someone to keep it running. That's where most teams get stuck, and where Prody steps in."
+        label="Why Prody exists"
+        title="The gap between working code and production"
+        description="You can build an app in an afternoon. Making it secure, deployed, and operable still takes a team. Prody is that team."
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">

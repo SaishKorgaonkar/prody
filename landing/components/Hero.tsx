@@ -1,5 +1,6 @@
 import { DASHBOARD_URL } from "@/lib/config";
 import { HeroVideoGlass } from "./HeroVideoGlass";
+import { ProductFlowStrip } from "./ProductFlow";
 
 export function Hero() {
   return (
@@ -10,39 +11,47 @@ export function Hero() {
         <HeroVideoGlass />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-14 sm:px-8 md:px-10 md:py-20 lg:px-16 lg:py-24">
-        <div className="flex min-h-[calc(100dvh-8.5rem)] max-w-[560px] flex-col justify-center">
+      <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-14 sm:px-8 md:px-10 md:py-16 lg:px-16 lg:py-20">
+        <div className="flex min-h-[min(520px,calc(100dvh-12rem))] max-w-[580px] flex-col justify-center">
           <p className="font-mono-label text-[12px] uppercase text-coral sm:text-[13px]">
-            Introducing Prody
+            Autonomous cloud engineer
           </p>
 
-          <h1 className="mt-4 text-[42px] font-semibold leading-[1.06] tracking-[-1.8px] sm:text-[56px] sm:tracking-[-2px] md:text-[64px] lg:text-[72px]">
-            <span className="text-white">Stuck here?</span>
+          <h1 className="mt-4 text-[40px] font-semibold leading-[1.08] tracking-[-1.6px] sm:text-[52px] sm:tracking-[-2px] md:text-[60px] lg:text-[68px]">
+            <span className="text-white">From code to production,</span>
             <br />
-            <span className="text-white/40">Prody&apos;s here to help.</span>
+            <span className="text-white/45">one guided flow.</span>
           </h1>
 
-          <p className="mt-6 text-[18px] font-medium leading-[1.35] text-white/90 sm:text-[20px]">
-            From your last commit to a live app, without opening the cloud console.
+          <p className="mt-6 text-[17px] font-medium leading-[1.4] text-white/85 sm:text-[19px]">
+            Security scan, architecture, approval, and deploy to Google Cloud —
+            without living in the console.
           </p>
 
-          <p className="mt-4 max-w-[480px] text-[15px] leading-[1.65] text-white/50 sm:text-[16px]">
-            You wrote the code. Prody handles security, deploy, and ops in plain
-            language, from your IDE or a GitHub link.
+          <p className="mt-4 max-w-[500px] text-[15px] leading-[1.65] text-white/50 sm:text-[16px]">
+            Start in your IDE or paste a GitHub link. If security fails, Prody
+            shows what to fix. When checks pass, you approve the plan and get a
+            live URL.
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <a
-              href="#extension"
+              href={DASHBOARD_URL}
               className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-3 text-[14px] font-medium text-[#09090b] transition-opacity hover:opacity-90 sm:w-auto"
+            >
+              Open Dashboard
+            </a>
+            <a
+              href="#extension"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-[14px] font-medium text-white transition-colors hover:border-white/35 hover:bg-white/[0.08] sm:w-auto"
             >
               Connect Extension
             </a>
             <a
-              href={DASHBOARD_URL}
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-[14px] font-medium text-white transition-colors hover:border-white/35 hover:bg-white/[0.08] sm:w-auto"
+              href="#how-it-works"
+              className="text-[14px] text-white/50 underline-offset-4 transition-colors hover:text-white/80 hover:underline sm:ml-1"
             >
-              Open Dashboard
+              See the full flow
             </a>
           </div>
         </div>
@@ -51,6 +60,8 @@ export function Hero() {
           <HeroVideoGlass mobile />
         </div>
       </div>
+
+      <ProductFlowStrip />
     </section>
   );
 }

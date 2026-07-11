@@ -1,10 +1,10 @@
 import { DASHBOARD_URL } from "@/lib/config";
 
 const links = [
+  { href: "#flow", label: "Flow" },
   { href: "#surfaces", label: "Product" },
   { href: "#how-it-works", label: "How it works" },
   { href: "#agents", label: "Agents" },
-  { href: "#why-prody", label: "Why Prody" },
 ];
 
 export function Nav({ dark = false }: { dark?: boolean }) {

@@ -1,11 +1,31 @@
 import { FilterChip, Section, SectionHeading } from "./ui";
 
 const agents = [
-  { name: "Orchestrator", role: "Routes work, manages approvals, keeps your session in sync", chip: "Routing" },
-  { name: "Security", role: "Finds secrets and vulnerabilities, explains risks in plain English", chip: "On-device" },
-  { name: "Architect", role: "Inspects your app and designs the right cloud architecture", chip: "Planning" },
-  { name: "DevOps", role: "Provisions resources and deploys with secure defaults", chip: "Deploy" },
-  { name: "SRE / Ops", role: "Monitors live services and scales when traffic spikes", chip: "Operations" },
+  {
+    name: "Intake",
+    role: "Detects stack and prepares your project for the pipeline",
+    chip: "Start",
+  },
+  {
+    name: "Security",
+    role: "Scans for vulnerabilities, emits findings, and enforces the gate",
+    chip: "Gate",
+  },
+  {
+    name: "Architect",
+    role: "Designs GCP infrastructure and generates an architecture diagram",
+    chip: "Plan",
+  },
+  {
+    name: "DevOps",
+    role: "Deploys to Cloud Run via MCP and returns your production URL",
+    chip: "Deploy",
+  },
+  {
+    name: "SRE",
+    role: "Health-checks the live service and hands off monitoring context",
+    chip: "Operate",
+  },
 ];
 
 export function AgentTeam() {
@@ -13,8 +33,8 @@ export function AgentTeam() {
     <Section id="agents" variant="stone">
       <SectionHeading
         label="Agent team"
-        title="Five helpers when you're stuck"
-        description="Each agent handles one part of the last mile, so you're never alone in the cloud console."
+        title="Who runs each step"
+        description="Specialized agents handle one phase each. The orchestrator keeps the session in sync across IDE and web."
       />
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
