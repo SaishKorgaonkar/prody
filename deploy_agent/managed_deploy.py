@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import subprocess
 import shutil
@@ -13,9 +13,6 @@ import tarfile
 import tempfile
 import time
 import zipfile
-import atexit
-import urllib.request
-import urllib.parse
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from importlib.metadata import PackageNotFoundError, version
@@ -36,18 +33,36 @@ try:
 except PackageNotFoundError:
     GENAI_VERSION = "0.0.0"
 
-if _version_tuple(GENAI_VERSION) < MIN_GENAI_VERSION:
-    print(
-        "Error: Google Managed Agents require google-genai >= 2.3.0 "
-        f"(installed: {GENAI_VERSION}). Run: python3.12 -m pip install -U google-genai"
-    )
-    raise SystemExit(1)
+_IMPORT_ERROR: str | None = None
+CLIENT: genai.Client | None = None
+ARCHITECTURE_OUTPUT_PATH = Path("architecture.jpg")
 
-API_KEY = os.environ.get("GEMINI_API_KEY")
-if not API_KEY:
-    print("Error: GEMINI_API_KEY environment variable not set.")
-    raise SystemExit(1)
-CLIENT = genai.Client(api_key=API_KEY)
+
+def ensure_client() -> genai.Client:
+    """Lazy-init the Gemini client so the engine can import this module safely."""
+    global CLIENT, _IMPORT_ERROR
+    if CLIENT is not None:
+        return CLIENT
+    if _IMPORT_ERROR:
+        raise RuntimeError(_IMPORT_ERROR)
+    if _version_tuple(GENAI_VERSION) < MIN_GENAI_VERSION:
+        _IMPORT_ERROR = (
+            "Google Managed Agents require google-genai >= 2.3.0 "
+            f"(installed: {GENAI_VERSION})"
+        )
+        raise RuntimeError(_IMPORT_ERROR)
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        _IMPORT_ERROR = "GEMINI_API_KEY environment variable not set"
+        raise RuntimeError(_IMPORT_ERROR)
+    CLIENT = genai.Client(api_key=api_key)
+    return CLIENT
+
+
+def set_architecture_output_path(path: str | Path) -> None:
+    global ARCHITECTURE_OUTPUT_PATH
+    ARCHITECTURE_OUTPUT_PATH = Path(path)
+    ARCHITECTURE_OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 # Resolve gcloud binary path - check common install locations
 GCLOUD_PATHS = [
@@ -57,7 +72,18 @@ GCLOUD_PATHS = [
     "/usr/local/bin",
     "/usr/bin",
 ]
-os.environ["PATH"] = ":".join(GCLOUD_PATHS) + ":" + os.environ.get("PATH", "")
+if sys.platform == "win32":
+    _win_gcloud = [
+        os.path.expandvars(r"%LOCALAPPDATA%\Google\Cloud SDK\google-cloud-sdk\bin"),
+        os.path.expandvars(r"%ProgramFiles%\Google\Cloud SDK\google-cloud-sdk\bin"),
+        os.path.expandvars(r"%ProgramFiles(x86)%\Google\Cloud SDK\google-cloud-sdk\bin"),
+    ]
+    os.environ["PATH"] = os.pathsep.join(
+        [p for p in _win_gcloud if p and os.path.isdir(p)]
+        + [os.environ.get("PATH", "")]
+    )
+else:
+    os.environ["PATH"] = ":".join(GCLOUD_PATHS) + ":" + os.environ.get("PATH", "")
 
 # gcloud requires Python 3.10+ - auto-detect and set CLOUDSDK_PYTHON
 PYTHON_CANDIDATES = [
@@ -496,7 +522,7 @@ def wait_for_interaction(interaction):
     while interaction.status in {"queued", "in_progress"}:
         time.sleep(INTERACTION_POLL_SECONDS)
         try:
-            interaction = CLIENT.interactions.get(
+            interaction = ensure_client().interactions.get(
                 id=interaction.id,
                 timeout=INTERACTION_POLL_TIMEOUT_SECONDS,
             )
@@ -565,7 +591,7 @@ def generate_architecture_image(prompt: str) -> str:
     for model_name in image_models:
         print(f"\n[Architect Tool] Attempting image generation with '{model_name}'...")
         try:
-            result = CLIENT.models.generate_images(
+            result = ensure_client().models.generate_images(
                 model=model_name,
                 prompt=full_prompt,
                 config=types.GenerateImagesConfig(
@@ -575,9 +601,12 @@ def generate_architecture_image(prompt: str) -> str:
             )
             if result.generated_images:
                 image = result.generated_images[0]
-                with open("architecture.jpg", "wb") as f:
+                with open(ARCHITECTURE_OUTPUT_PATH, "wb") as f:
                     f.write(image.image.image_bytes)
-                return f"Successfully generated and saved architecture diagram to architecture.jpg (used model: {model_name})"
+                return (
+                    f"Successfully generated and saved architecture diagram to "
+                    f"{ARCHITECTURE_OUTPUT_PATH} (used model: {model_name})"
+                )
         except Exception as e:
             print(f"[Architect Tool] Model '{model_name}' failed: {e}")
             continue
@@ -1083,7 +1112,7 @@ def run_managed_agent(
         ],
     )
     try:
-        interaction = CLIENT.interactions.create(
+        interaction = ensure_client().interactions.create(
             agent=MANAGED_AGENT,
             input=prompt,
             environment=environment or "remote",
@@ -1171,7 +1200,7 @@ def run_managed_agent(
             )
 
         try:
-            interaction = CLIENT.interactions.create(
+            interaction = ensure_client().interactions.create(
                 agent=MANAGED_AGENT,
                 input=function_results,
                 environment=interaction.environment_id,
@@ -1205,137 +1234,10 @@ def run_managed_agent(
     )
     return interaction
 
-# ── Pre-deploy security gate (functional + pentest) ───────────────────────
-# Before handing off to the DevOps deployment agent, consult the LOCAL
-# functional-testing + penetration-testing gate — the FastAPI service in
-# pentest/main.py — and refuse to deploy on a FAIL verdict. Functional
-# correctness is checked first; the pentest chains only if the app works; deploy
-# proceeds only on a clean (or warnings-only) combined verdict. Talks to the
-# gate over HTTP (stdlib urllib, no extra deps) and auto-starts the service on
-# loopback if it isn't already running. Env overrides: SECURITY_GATE_URL,
-# SECURITY_GATE_TIMEOUT_S, SKIP_SECURITY_GATE.
-SECURITY_GATE_URL = os.environ.get("SECURITY_GATE_URL", "http://127.0.0.1:8900").rstrip("/")
-SECURITY_GATE_TIMEOUT_S = int(os.environ.get("SECURITY_GATE_TIMEOUT_S", "600"))
-SKIP_SECURITY_GATE = os.environ.get("SKIP_SECURITY_GATE", "").lower() in ("1", "true", "yes")
-_GATE_SERVER_PROC = None
-
-
-def _gate_request(method: str, path: str, payload: dict | None = None, timeout: int = 15):
-    url = f"{SECURITY_GATE_URL}{path}"
-    data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        url, data=data, method=method,
-        headers={"content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode() or "null")
-
-
-def _gate_server_reachable() -> bool:
-    try:
-        _gate_request("GET", "/", timeout=3)
-        return True
-    except Exception:
-        return False
-
-
-@atexit.register
-def _shutdown_gate_server() -> None:
-    if _GATE_SERVER_PROC and _GATE_SERVER_PROC.poll() is None:
-        _GATE_SERVER_PROC.terminate()
-
-
-def _ensure_gate_server() -> bool:
-    """Make the pentest gate reachable; auto-start it on loopback if it isn't."""
-    global _GATE_SERVER_PROC
-    if _gate_server_reachable():
-        return True
-    parsed = urllib.parse.urlparse(SECURITY_GATE_URL)
-    if (parsed.hostname or "") not in ("127.0.0.1", "localhost", "::1"):
-        return False  # never spawn a server for a remote gate URL
-    port = parsed.port or 8900
-    print(f"[Security Gate] Gate service not running — starting it locally on port {port}...")
-    repo_root = Path(__file__).resolve().parent
-    try:
-        _GATE_SERVER_PROC = subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "pentest.main:app",
-             "--host", "127.0.0.1", "--port", str(port), "--log-level", "warning"],
-            cwd=str(repo_root), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    except Exception as exc:
-        print(f"[Security Gate] Could not launch the gate service: {exc}")
-        return False
-    deadline = time.time() + 30
-    while time.time() < deadline:
-        if _gate_server_reachable():
-            return True
-        if _GATE_SERVER_PROC.poll() is not None:
-            return False
-        time.sleep(0.5)
-    return False
-
-
-def _print_gate_summary(gate: dict) -> None:
-    fv = gate.get("functional") if isinstance(gate.get("functional"), dict) else {}
-    sv = gate.get("security")
-    fstat = fv.get("status") if isinstance(fv, dict) else fv
-    sstat = sv.get("status") if isinstance(sv, dict) else sv
-    print("\n──────────── Security Gate Verdict ────────────")
-    print(f"  functional : {fstat}")
-    print(f"  security   : {sstat}")
-    print(f"  COMBINED   : {gate.get('combined')}")
-    for label, section in (("functional", fv), ("security", sv if isinstance(sv, dict) else {})):
-        findings = section.get("findings", []) if isinstance(section, dict) else []
-        for f in findings[:5]:
-            print(f"    [{label}] {f.get('severity')}: {f.get('title')}")
-        if len(findings) > 5:
-            print(f"    [{label}] ... and {len(findings) - 5} more")
-    print("───────────────────────────────────────────────")
-
-
-def run_security_gate(application_directory):
-    """Run the functional + pentest gate on a local app dir before deploying.
-
-    Returns the combined gate dict {combined, functional, security, scan_ids},
-    or None when the gate is skipped/unavailable (deployment then proceeds)."""
-    if SKIP_SECURITY_GATE:
-        print("[Security Gate] SKIP_SECURITY_GATE set — skipping the pre-deploy gate.")
-        return None
-    if not application_directory or not os.path.isdir(application_directory):
-        print("[Security Gate] No local application directory available — skipping the gate.")
-        return None
-    if not _ensure_gate_server():
-        print(f"[Security Gate] Gate service unreachable at {SECURITY_GATE_URL} and could "
-              f"not be started — skipping. (Set SKIP_SECURITY_GATE=1 to silence.)")
-        return None
-
-    project_path = str(Path(application_directory).expanduser().resolve())
-    print(f"[Security Gate] Scanning {project_path} (functional tests -> pentest)...")
-    try:
-        started = _gate_request("POST", "/functest/start",
-                                {"project_path": project_path, "chain_pentest": True})
-        scan_id = started.get("scan_id")
-    except Exception as exc:
-        print(f"[Security Gate] Could not start the scan: {exc} — skipping.")
-        return None
-    if not scan_id:
-        print("[Security Gate] Gate did not return a scan_id — skipping.")
-        return None
-
-    deadline = time.time() + SECURITY_GATE_TIMEOUT_S
-    gate = None
-    while time.time() < deadline:
-        try:
-            gate = _gate_request("GET", f"/functest/{scan_id}/gate", timeout=15)
-        except Exception:
-            gate = None
-        if gate and gate.get("combined") not in (None, "PENDING"):
-            return gate
-        time.sleep(3)
-    print("[Security Gate] Timed out waiting for the gate verdict — proceeding cautiously.")
-    return gate
-
-
 def main():
     global ACTIVE_APPLICATION_DIRECTORY
+
+    ensure_client()
 
     architect_instructions = (
         "You are a Cloud Architect specialized strictly in designing GCP cloud architectures. "
@@ -1421,7 +1323,7 @@ def main():
         "deploy_infrastructure": deploy_infrastructure,
     }
     
-    # ── Phase 1: Cloud Architect (iAPI) ───────────────────────────────────
+    # ΓöÇΓöÇ Phase 1: Cloud Architect (iAPI) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     print_banner()
     print("--- Phase 1: Cloud Architect ---")
     architect_interaction_id = None
@@ -1491,30 +1393,7 @@ def main():
             LOGGER.exception("architect_communication_failed")
             print(f"Error communicating with Architect: {e}")
 
-    # ── Security gate: functional + pentest must pass before deploying ─────
-    # Authorized pre-deploy security QA on the user's OWN app: run the local
-    # functional-testing + penetration-testing gate and refuse to hand off to
-    # DevOps on a FAIL verdict. A broken app never reaches deployment, and an
-    # insecure one is stopped before it ships.
-    gate_dir = application_directory or ACTIVE_APPLICATION_DIRECTORY
-    if not gate_dir:
-        gate_dir = get_input(
-            "Local application directory for the pre-deploy security gate "
-            "(blank to skip): "
-        ).strip() or None
-    gate = run_security_gate(gate_dir)
-    if gate is not None:
-        _print_gate_summary(gate)
-        if gate.get("combined") in ("FAIL", "ERROR"):
-            print(
-                "\n🚫 [Security Gate] Deployment BLOCKED — the application did not pass "
-                "the functional + security gate. Fix the reported issues and re-run, or "
-                "set SKIP_SECURITY_GATE=1 to override (not recommended).\n"
-            )
-            return
-        print("\n✅ [Security Gate] Passed — handing off to the DevOps deployment agent.\n")
-
-    # ── Phase 2: Senior DevOps Agent (iAPI) ───────────────────────────────
+    # ΓöÇΓöÇ Phase 2: Senior DevOps Agent (iAPI) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     print("--- Phase 2: Senior DevOps ---")
     devops_interaction_id = None
 

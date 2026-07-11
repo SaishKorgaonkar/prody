@@ -1,0 +1,28 @@
+---
+description: Prody security fix loop — read PRODY_SECURITY_FIXES.md and implement all open issues
+globs: PRODY_SECURITY_FIXES.md
+alwaysApply: false
+---
+
+# Prody security fixes (Cursor agent)
+
+When this file exists, the user ran **Prody: Ship to Production** and the security gate found issues.
+
+## Your job
+
+1. Read every section under **Open issues (implement these fixes)**.
+2. Implement each **Suggested fix** in the workspace — minimal, secure changes only.
+3. Do not bypass, disable, or weaken the Prody security gate.
+4. Do not deploy manually; Prody engine handles GCP deploy after the gate passes.
+5. After all fixes, tell the user to run **Prody: Retry After Fixes** (Command Palette).
+
+## Fix quality
+
+- Use parameterized queries, no hardcoded secrets, escape user output.
+- Match existing code style in the project.
+- If a finding includes a **Location**, open that file and fix there first.
+
+## After fixing
+
+- Summarize what you changed (file + issue id).
+- Remind: **Prody: Retry After Fixes** until gate is `PASS` or `PASS_WITH_WARNINGS`.

@@ -1,0 +1,26 @@
+---
+description: Prody cloud engineer — ship, security gate, deploy workflow for this repo
+alwaysApply: true
+---
+
+# Prody (this project)
+
+Autonomous cloud engineer: **security scan → fix loop → architecture → approve → deploy**.
+
+## When user asks to ship, deploy, or run Prody
+
+1. Engine must be up: `uvicorn backend.main:app --host 127.0.0.1 --port 8000`
+2. Security gate: `uvicorn pentest.main:app --host 127.0.0.1 --port 8900`
+3. User runs **Prody: Ship to Production** (Prody sidebar extension) — do not duplicate the pipeline in chat unless engine is offline.
+
+## Security fail loop
+
+- Findings appear in Prody sidebar + `PRODY_SECURITY_FIXES.md`.
+- Implement fixes from that MD file, then user runs **Prody: Retry After Fixes**.
+- Never proceed to deploy while gate is `FAIL`.
+
+## Surfaces
+
+- IDE extension: Prody activity bar (same as VS Code extension)
+- Dashboard: http://localhost:3001
+- See root `AGENTS.md` and `extension/README.md`
