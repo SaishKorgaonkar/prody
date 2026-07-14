@@ -15,7 +15,7 @@ export function ReadinessScore() {
       <SectionHeading
         label="Production readiness"
         title="Business language, not audit reports"
-        description="Security gate, deploy status, and cost hints — answers founders understand, not CVE dumps."
+        description="Security gate, deploy status, and cost hints. Answers founders understand, not CVE dumps."
       />
 
       <div className="mt-12 rounded-[22px] border border-hairline bg-stone p-8 md:p-10">

@@ -3,7 +3,7 @@ import { Section, SectionHeading } from "./ui";
 const pains = [
   {
     title: "Security before deploy",
-    body: "Five ordered checks catch the mistakes that get vibe-coded apps hacked — secrets, data leaks, and attacker paths — before anything goes live.",
+    body: "Five ordered checks catch the mistakes that get vibe-coded apps hacked: secrets, data leaks, and attacker paths, before anything goes live.",
   },
   {
     title: "Any cloud, one flow",
@@ -11,7 +11,7 @@ const pains = [
   },
   {
     title: "Manage what you ship",
-    body: "Deploy from IDE, forget in production? Prody keeps every session visible — stop resources before they surprise you on the bill.",
+    body: "Deploy from IDE, forget in production? Prody keeps every session visible, so you can stop resources before they surprise you on the bill.",
   },
 ];
 

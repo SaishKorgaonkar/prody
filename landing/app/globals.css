@@ -50,7 +50,7 @@ body {
   display: none;
 }
 
-/* Text overlay gradients — video full bleed behind copy */
+/* Text overlay gradients: video full bleed behind copy */
 .hero-video-fade {
   background: linear-gradient(
     180deg,
@@ -185,5 +185,16 @@ h3 {
   .bento-tile:hover {
     transform: translateY(-2px);
     border-color: color-mix(in srgb, var(--coral) 35%, var(--hairline));
+  }
+}
+
+.footer-shell {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+@media (hover: hover) {
+  .footer-shell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 28px 88px -32px rgba(23, 23, 28, 0.22);
   }
 }

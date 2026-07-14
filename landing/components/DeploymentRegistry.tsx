@@ -3,7 +3,7 @@ import { Section, SectionHeading } from "./ui";
 const features = [
   {
     title: "Every deploy in one list",
-    body: "Started from IDE, dashboard, or CLI — all sessions appear in your deployment registry instantly.",
+    body: "Started from IDE, dashboard, or CLI. All sessions appear in your deployment registry instantly.",
   },
   {
     title: "Stop before it costs you",
@@ -11,7 +11,7 @@ const features = [
   },
   {
     title: "Live health + readiness",
-    body: "Post-deploy SRE checks, readiness score, and plain-language status — not another wall of logs.",
+    body: "Post-deploy SRE checks, readiness score, and plain-language status, not another wall of logs.",
   },
 ];
 
@@ -33,7 +33,7 @@ export function DeploymentRegistry() {
             {[
               { name: "notes-api", cloud: "AWS", status: "Running", cost: "~$8/mo" },
               { name: "demo-app", cloud: "GCP", status: "Healthy", cost: "~$12/mo" },
-              { name: "shop-beta", cloud: "Azure", status: "Stopped", cost: "—" },
+              { name: "shop-beta", cloud: "Azure", status: "Stopped", cost: "N/A" },
             ].map((row) => (
               <li
                 key={row.name}
@@ -59,7 +59,7 @@ export function DeploymentRegistry() {
             ))}
           </ul>
           <p className="mt-4 text-[12px] text-ink-muted">
-            Illustrative UI — same data whether you shipped from IDE or CLI.
+            Illustrative UI. Same data whether you shipped from IDE or CLI.
           </p>
         </div>
       </div>

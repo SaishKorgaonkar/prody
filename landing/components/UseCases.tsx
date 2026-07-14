@@ -3,7 +3,7 @@ import { Section, SectionHeading } from "./ui";
 const audiences = [
   {
     title: "Solo developers",
-    body: "Ship side projects to any cloud with security checks and teardown — no ops rabbit holes.",
+    body: "Ship side projects to any cloud with security checks and teardown, with no ops rabbit holes.",
   },
   {
     title: "Startup founders",

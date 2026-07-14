@@ -1,59 +1,131 @@
-const links = [
-  { href: "#security", label: "Security" },
-  { href: "#clouds", label: "Clouds" },
-  { href: "#surfaces", label: "Product" },
-  { href: "#flow", label: "Flow" },
-  { href: "#how-it-works", label: "How it works" },
+"use client";
+
+import type { MouseEvent } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+
+const sectionLinks = [
+  { label: "Platform", href: "#platform" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Why Prody", href: "#why-prody" },
 ];
 
-export function Nav({ dark = false }: { dark?: boolean }) {
+const SCROLL_END = 140;
+
+function scrollHomeToTop(e: MouseEvent<HTMLAnchorElement>) {
+  e.preventDefault();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.history.replaceState(null, "", "/");
+}
+
+export function Nav() {
+  const { scrollY } = useScroll();
+
+  const top = useTransform(scrollY, [0, SCROLL_END], [0, 16]);
+  const sideInset = useTransform(scrollY, [0, SCROLL_END], [0, 16]);
+  const maxWidth = useTransform(scrollY, [0, SCROLL_END], [2000, 896]);
+  const borderRadius = useTransform(scrollY, [0, SCROLL_END], [0, 9999]);
+  const paddingX = useTransform(scrollY, [0, SCROLL_END], [48, 20]);
+  const paddingY = useTransform(scrollY, [0, SCROLL_END], [14, 10]);
+  const blur = useTransform(scrollY, [0, SCROLL_END], [10, 16]);
+  const shadowOpacity = useTransform(scrollY, [0, SCROLL_END], [0, 1]);
+
+  const background = useTransform(
+    scrollY,
+    [0, SCROLL_END],
+    ["rgba(9, 9, 11, 0.82)", "rgba(255, 255, 255, 0.92)"]
+  );
+  const border = useTransform(
+    scrollY,
+    [0, SCROLL_END],
+    [
+      "1px solid rgba(255, 255, 255, 0.12)",
+      "1px solid rgba(217, 217, 221, 0.95)",
+    ]
+  );
+  const backdropFilter = useTransform(blur, (b) => `blur(${b}px)`);
+  const boxShadow = useTransform(shadowOpacity, (o) =>
+    o < 0.05
+      ? "none"
+      : `0 4px 24px rgba(15, 23, 42, ${o * 0.08}), 0 1px 3px rgba(15, 23, 42, ${o * 0.04})`
+  );
+
+  const logoColor = useTransform(scrollY, [0, SCROLL_END], ["#ffffff", "#212121"]);
+  const linkColor = useTransform(
+    scrollY,
+    [0, SCROLL_END],
+    ["rgba(255, 255, 255, 0.65)", "rgba(33, 33, 33, 0.72)"]
+  );
+  const ctaBackground = useTransform(
+    scrollY,
+    [0, SCROLL_END],
+    ["#ffffff", "#17171c"]
+  );
+  const ctaColor = useTransform(
+    scrollY,
+    [0, SCROLL_END],
+    ["#09090b", "#ffffff"]
+  );
+
   return (
-    <header
-      className={`sticky top-0 z-50 border-b backdrop-blur-md ${
-        dark
-          ? "border-white/10 bg-[#09090b]/90"
-          : "border-hairline bg-canvas/95"
-      }`}
+    <motion.header
+      className="pointer-events-none fixed inset-x-0 z-50 flex justify-center"
+      style={{ top, paddingLeft: sideInset, paddingRight: sideInset }}
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
     >
-      <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between gap-4 px-4 sm:h-16 sm:px-6 md:px-10 lg:px-16">
-        <a
+      <motion.div
+        className="pointer-events-auto flex w-full items-center gap-3 md:gap-4"
+        style={{
+          maxWidth,
+          borderRadius,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+          background,
+          border,
+          backdropFilter,
+          WebkitBackdropFilter: backdropFilter,
+          boxShadow,
+        }}
+      >
+        <motion.a
           href="#"
-          className={`font-display shrink-0 text-[18px] font-medium tracking-[-0.4px] sm:text-[20px] ${
-            dark ? "text-white" : "text-ink"
-          }`}
+          onClick={scrollHomeToTop}
+          className="font-display shrink-0 text-base font-medium tracking-[-0.4px] md:text-lg"
+          style={{ color: logoColor }}
         >
           Prody
-        </a>
+        </motion.a>
 
-        <nav className="hidden items-center justify-center gap-4 md:flex md:gap-5 lg:gap-7">
-          {links.map((link) => (
-            <a
-              key={link.href}
+        <nav className="hidden flex-1 items-center justify-center gap-5 md:flex">
+          {sectionLinks.map((link) => (
+            <motion.a
+              key={link.label}
               href={link.href}
-              className={`text-[14px] transition-colors ${
-                dark
-                  ? "text-white/60 hover:text-white"
-                  : "text-ink hover:text-action-blue"
-              }`}
+              className="group relative text-sm whitespace-nowrap transition-opacity hover:opacity-100"
+              style={{ color: linkColor }}
             >
               {link.label}
-            </a>
+              <span className="absolute -bottom-1 left-0 h-px w-0 bg-coral transition-all group-hover:w-full" />
+            </motion.a>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center justify-end">
-          <a
+        <div className="ml-auto flex shrink-0 items-center">
+          <motion.a
             href="#early-access"
-            className={`inline-flex min-h-9 items-center justify-center rounded-full px-4 py-2 text-[12px] font-medium transition-opacity hover:opacity-90 sm:min-h-10 sm:px-5 sm:text-[13px] ${
-              dark
-                ? "bg-white text-[#09090b]"
-                : "bg-primary text-white"
-            }`}
+            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap md:px-5 md:text-sm"
+            style={{
+              backgroundColor: ctaBackground,
+              color: ctaColor,
+            }}
           >
             Early access
-          </a>
+          </motion.a>
         </div>
-      </div>
-    </header>
+      </motion.div>
+    </motion.header>
   );
 }

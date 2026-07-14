@@ -18,7 +18,7 @@ const surfaces = [
     chip: "Dashboard",
     title: "Manage every deployment",
     subtitle: "Web · GitHub · Local path",
-    body: "See all your deploys in one place — started from IDE or web. Live agent stream, 5-check security status, teardown to stop billing.",
+    body: "See all your deploys in one place, whether started from IDE or web. Live agent stream, 5-check security status, teardown to stop billing.",
     bullets: [
       "Deployment registry across surfaces",
       "5-check security panel with live status",
@@ -45,7 +45,7 @@ export function ThreeSurfaces() {
       <SectionHeading
         label="Three surfaces"
         title="One pipeline, everywhere you work"
-        description="Deploy from IDE, dashboard, or CLI. Every session lands in the same registry — manage production from one place."
+        description="Deploy from IDE, dashboard, or CLI. Every session lands in the same registry, so you manage production from one place."
       />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-3">

@@ -1,4 +1,5 @@
-import { Section } from "./ui";
+import type { ReactNode } from "react";
+import { Section, SectionHeading } from "./ui";
 
 const audiences = [
   { title: "Solo developer", line: "Ship side projects to any cloud" },
@@ -13,39 +14,53 @@ const stats = [
   { n: "1", label: "registry" },
 ];
 
+const dimensions = [
+  { label: "Security", v: 92 },
+  { label: "Reliability", v: 88 },
+  { label: "Performance", v: 85 },
+];
+
+function BentoCard({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border border-hairline bg-canvas p-6 md:p-7 ${className}`}
+    >
+      <p className="font-mono-label text-[12px] uppercase text-coral">{label}</p>
+      {children}
+    </div>
+  );
+}
+
 export function BentoProof() {
   return (
     <Section id="why-prody" variant="stone" className="!py-16 md:!py-20">
-      <div className="mb-10 max-w-[560px]">
-        <p className="font-mono-label text-[14px] uppercase text-coral">
-          Why Prody
-        </p>
-        <h2 className="font-display mt-3 text-[32px] leading-[1.12] tracking-[-0.48px] text-ink md:text-[40px]">
-          Production clarity, not more dashboards
-        </h2>
-      </div>
+      <SectionHeading
+        label="Why Prody"
+        title="Production clarity, not more dashboards"
+        description="Plain-language status on security, reliability, and cost, built for founders and leads, not security auditors."
+      />
 
-      <div className="grid gap-4 md:grid-cols-6 md:grid-rows-2 md:gap-5">
-        <div className="bento-tile md:col-span-3 md:row-span-2 rounded-[22px] border border-hairline bg-canvas p-8 md:p-10">
-          <p className="font-mono-label text-[12px] uppercase text-ink-muted">
-            Production readiness
-          </p>
-          <p className="font-display mt-4 text-[64px] leading-none tracking-[-2px] text-ink md:text-[72px]">
+      <div className="mt-10 grid gap-5 lg:grid-cols-2 lg:items-stretch">
+        <BentoCard label="Production readiness" className="flex flex-col">
+          <p className="font-display mt-4 text-[56px] leading-none tracking-[-2px] text-ink md:text-[64px]">
             87
-            <span className="text-[24px] text-ink-muted">/100</span>
+            <span className="text-[22px] text-ink-muted">/100</span>
           </p>
-          <p className="mt-4 max-w-[280px] text-[15px] leading-relaxed text-ink-muted">
-            Plain-language status on security, reliability, and cost. Built for
-            founders and leads, not security auditors.
+          <p className="mt-4 max-w-[320px] text-[14px] leading-relaxed text-ink-muted">
+            Overall readiness with actionable recommendations before you launch.
           </p>
-          <div className="mt-8 space-y-2">
-            {[
-              { l: "Security", v: 92 },
-              { l: "Reliability", v: 88 },
-              { l: "Performance", v: 85 },
-            ].map((d) => (
-              <div key={d.l} className="flex items-center gap-3">
-                <span className="w-24 text-[13px] text-ink-muted">{d.l}</span>
+          <div className="mt-auto space-y-2.5 border-t border-hairline pt-5">
+            {dimensions.map((d) => (
+              <div key={d.label} className="flex items-center gap-3">
+                <span className="w-24 text-[13px] text-ink-muted">{d.label}</span>
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone">
                   <div
                     className="h-full rounded-full bg-enterprise-green"
@@ -55,34 +70,36 @@ export function BentoProof() {
               </div>
             ))}
           </div>
-        </div>
+        </BentoCard>
 
-        {audiences.map((a, i) => (
-          <div
-            key={a.title}
-            className={`bento-tile rounded-[22px] border border-hairline bg-canvas p-6 md:col-span-1 ${
-              i === 0 ? "md:col-start-4" : ""
-            }`}
-          >
-            <p className="font-mono-label text-[11px] uppercase text-coral">
-              Built for
-            </p>
-            <h3 className="font-display mt-3 text-[18px] text-ink">{a.title}</h3>
-            <p className="mt-1 text-[13px] text-ink-muted">{a.line}</p>
+        <div className="flex flex-col gap-5">
+          <div className="grid gap-5 sm:grid-cols-3">
+            {audiences.map((a) => (
+              <BentoCard key={a.title} label="Built for">
+                <h3 className="font-display mt-3 text-[17px] leading-snug text-ink">
+                  {a.title}
+                </h3>
+                <p className="mt-1.5 text-[13px] leading-snug text-ink-muted">
+                  {a.line}
+                </p>
+              </BentoCard>
+            ))}
           </div>
-        ))}
 
-        <div className="bento-tile flex flex-wrap gap-6 rounded-[22px] border border-dashed border-coral/35 bg-coral/[0.04] p-6 md:col-span-3 md:flex-nowrap md:justify-between md:px-10">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center md:text-left">
-              <p className="font-display text-[36px] leading-none text-coral">
-                {s.n}
-              </p>
-              <p className="mt-1 text-[12px] uppercase tracking-wide text-ink-muted">
-                {s.label}
-              </p>
+          <BentoCard label="At a glance">
+            <div className="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {stats.map((s) => (
+                <div key={s.label}>
+                  <p className="font-display text-[32px] leading-none text-ink">
+                    {s.n}
+                  </p>
+                  <p className="mt-1.5 text-[11px] uppercase tracking-wide text-ink-muted">
+                    {s.label}
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
+          </BentoCard>
         </div>
       </div>
     </Section>

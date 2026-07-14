@@ -81,12 +81,12 @@ export function ProductFlowSection() {
           End-to-end
         </p>
         <h2 className="font-display mt-3 max-w-[720px] text-[32px] leading-[1.12] tracking-[-0.5px] text-ink md:text-[40px]">
-          One orchestrator. IDE, dashboard, and CLI — same session, same
+          One orchestrator. IDE, dashboard, and CLI, same session, same
           deployment registry.
         </h2>
         <p className="mt-4 max-w-[600px] text-[16px] leading-relaxed text-ink-muted">
           Prody never skips security. Five ordered checks run before architecture
-          or deploy. Fail the gate, fix in your editor, retry. Pass — and only
+          or deploy. Fail the gate, fix in your editor, retry. Pass, and only
           then does your cloud of choice enter the picture.
         </p>
 

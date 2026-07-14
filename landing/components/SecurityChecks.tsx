@@ -4,7 +4,7 @@ const checks = [
   {
     n: "01",
     title: "Secret leak prevention",
-    body: "Hardcoded API keys, exposed env vars, and client-side secrets — caught before deploy.",
+    body: "Hardcoded API keys, exposed env vars, and client-side secrets, caught before deploy.",
     tool: "Gitleaks-style scan",
   },
   {
@@ -39,7 +39,7 @@ export function SecurityChecks() {
       <SectionHeading
         label="Security gate"
         title="Five checks before you launch"
-        description="Prody runs a ordered security pipeline on your code — the mistakes that get vibe-coded apps hacked, found and explained before anything goes live."
+        description="Prody runs a ordered security pipeline on your code. The mistakes that get vibe-coded apps hacked, found and explained before anything goes live."
       />
 
       <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -65,7 +65,7 @@ export function SecurityChecks() {
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-ink">
             Deploy is blocked on critical findings. Prody writes a fix guide your
-            coding agent can implement — then you retry until the gate passes.
+            coding agent can implement, then you retry until the gate passes.
           </p>
         </Card>
       </div>

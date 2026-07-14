@@ -13,7 +13,7 @@ const pillars = [
   },
   {
     title: "Real infrastructure",
-    body: "Actual cloud provisioning on GCP, AWS, or Azure — not mockups. Prody executes, explains, and asks before critical actions.",
+    body: "Actual cloud provisioning on GCP, AWS, or Azure, not mockups. Prody executes, explains, and asks before critical actions.",
     chip: "Multi-cloud",
   },
   {

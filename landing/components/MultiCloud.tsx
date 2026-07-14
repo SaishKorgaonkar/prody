@@ -17,7 +17,7 @@ const clouds = [
     id: "azure",
     name: "Azure",
     service: "Container Apps",
-    detail: "Scale-to-zero containers — one orchestrator, your choice of cloud.",
+    detail: "Scale-to-zero containers. One orchestrator, your choice of cloud.",
   },
 ];
 
@@ -27,7 +27,7 @@ export function MultiCloud() {
       <SectionHeading
         label="Multi-cloud"
         title="Deploy where your users are"
-        description="Pick GCP, AWS, or Azure at intake. Prody's orchestrator handles the rest — same pipeline, same deployment registry, different cloud."
+        description="Pick GCP, AWS, or Azure at intake. Prody's orchestrator handles the rest: same pipeline, same deployment registry, different cloud."
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">

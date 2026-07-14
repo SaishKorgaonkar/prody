@@ -8,7 +8,7 @@ const agents = [
   },
   {
     name: "Security",
-    role: "Runs 5 ordered checks — secrets through attacker review — and enforces the gate",
+    role: "Runs 5 ordered checks, from secrets through attacker review, and enforces the gate",
     chip: "5 checks",
   },
   {

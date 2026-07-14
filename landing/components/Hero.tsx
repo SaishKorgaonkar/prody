@@ -27,14 +27,9 @@ export function Hero() {
             <span className="text-white/45">to any cloud.</span>
           </h1>
 
-          <p className="mt-4 text-[15px] font-medium leading-[1.45] text-white/85 sm:mt-5 sm:text-[17px] md:text-[18px] lg:mt-6 lg:text-[19px]">
-            Five security checks, multi-cloud deploy, and one registry. Ship
-            from your IDE, dashboard, or terminal.
-          </p>
-
-          <p className="mt-3 max-w-[520px] text-[14px] leading-[1.6] text-white/50 sm:mt-4 sm:text-[15px] lg:text-[16px]">
-            Prody closes the gap between AI-generated code and production. You
-            approve. Prody executes.
+          <p className="mt-4 max-w-[520px] text-[15px] leading-[1.55] text-white/75 sm:mt-5 sm:text-[17px] md:text-[18px] lg:mt-6">
+            Five security checks, then deploy to GCP, AWS, or Azure. From your
+            IDE, dashboard, or terminal.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center">
@@ -45,13 +40,13 @@ export function Hero() {
               Get early access
             </a>
             <a
-              href="#security"
+              href="#platform"
               className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-[14px] font-medium text-white backdrop-blur-sm transition-colors hover:border-white/35 hover:bg-white/[0.08] sm:w-auto"
             >
-              See security checks
+              See the platform
             </a>
             <a
-              href="#flow"
+              href="#how-it-works"
               className="inline-flex min-h-11 items-center justify-center text-[14px] text-white/50 underline-offset-4 transition-colors hover:text-white/80 hover:underline sm:min-h-0 sm:justify-start"
             >
               How it works

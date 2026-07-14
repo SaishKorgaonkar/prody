@@ -27,7 +27,7 @@ export function ModelFlex() {
       <SectionHeading
         label="Bring your own model"
         title="Your models, your rules"
-        description="Configure models per role — local narration, cloud agents, or full managed deploy. Prody recommends defaults; you stay in control."
+        description="Configure models per role: local narration, cloud agents, or full managed deploy. Prody recommends defaults; you stay in control."
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">
