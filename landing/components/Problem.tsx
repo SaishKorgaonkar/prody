@@ -3,15 +3,15 @@ import { Section, SectionHeading } from "./ui";
 const pains = [
   {
     title: "Security before deploy",
-    body: "Shipping without a scan is how secrets and vulns reach production. Prody gates deploy on a real review.",
+    body: "Five ordered checks catch the mistakes that get vibe-coded apps hacked — secrets, data leaks, and attacker paths — before anything goes live.",
   },
   {
-    title: "Architecture without a degree",
-    body: "Cloud Run, IAM, networking — Prody designs it, shows you a diagram, and waits for approval.",
+    title: "Any cloud, one flow",
+    body: "GCP, AWS, or Azure. Same orchestrator, same security gate, same deployment registry. No console PhD required.",
   },
   {
-    title: "Ops after go-live",
-    body: "A live URL is not the finish line. SRE watches health and explains readiness in plain language.",
+    title: "Manage what you ship",
+    body: "Deploy from IDE, forget in production? Prody keeps every session visible — stop resources before they surprise you on the bill.",
   },
 ];
 
@@ -21,7 +21,7 @@ export function Problem() {
       <SectionHeading
         label="Why Prody exists"
         title="The gap between working code and production"
-        description="You can build an app in an afternoon. Making it secure, deployed, and operable still takes a team. Prody is that team."
+        description="AI can build an app in an afternoon. Making it secure, deployed on the right cloud, and manageable still takes a team. Prody is that team."
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">

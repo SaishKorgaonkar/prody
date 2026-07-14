@@ -1,10 +1,9 @@
-import { DASHBOARD_URL } from "@/lib/config";
-
 const links = [
-  { href: "#flow", label: "Flow" },
+  { href: "#security", label: "Security" },
+  { href: "#clouds", label: "Clouds" },
   { href: "#surfaces", label: "Product" },
+  { href: "#flow", label: "Flow" },
   { href: "#how-it-works", label: "How it works" },
-  { href: "#agents", label: "Agents" },
 ];
 
 export function Nav({ dark = false }: { dark?: boolean }) {
@@ -26,7 +25,7 @@ export function Nav({ dark = false }: { dark?: boolean }) {
           Prody
         </a>
 
-        <nav className="hidden items-center justify-center gap-6 lg:flex lg:gap-8">
+        <nav className="hidden items-center justify-center gap-5 lg:flex lg:gap-7">
           {links.map((link) => (
             <a
               key={link.href}
@@ -42,26 +41,16 @@ export function Nav({ dark = false }: { dark?: boolean }) {
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-5">
+        <div className="flex shrink-0 items-center justify-end">
           <a
-            href="#extension"
-            className={`hidden text-[14px] underline underline-offset-4 md:inline ${
-              dark
-                ? "text-white/60 hover:text-white"
-                : "text-ink"
-            }`}
-          >
-            Sign in
-          </a>
-          <a
-            href={DASHBOARD_URL}
-            className={`inline-flex min-h-9 items-center justify-center rounded-full px-4 py-2 text-[12px] font-medium transition-opacity hover:opacity-90 sm:min-h-10 sm:px-5 sm:py-2.5 sm:text-[13px] ${
+            href="#early-access"
+            className={`inline-flex min-h-9 items-center justify-center rounded-full px-4 py-2 text-[12px] font-medium transition-opacity hover:opacity-90 sm:min-h-10 sm:px-5 sm:text-[13px] ${
               dark
                 ? "bg-white text-[#09090b]"
                 : "bg-primary text-white"
             }`}
           >
-            Get started
+            Early access
           </a>
         </div>
       </div>

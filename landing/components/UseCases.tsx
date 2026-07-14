@@ -3,15 +3,15 @@ import { Section, SectionHeading } from "./ui";
 const audiences = [
   {
     title: "Solo developers",
-    body: "Ship side projects to GCP without learning the console first.",
+    body: "Ship side projects to any cloud with security checks and teardown — no ops rabbit holes.",
   },
   {
     title: "Startup founders",
-    body: "Get security, deploy, and ops coverage without hiring infra staff.",
+    body: "Security, multi-cloud deploy, and a deployment registry without hiring infra staff.",
   },
   {
-    title: "Small businesses",
-    body: "Run production apps with an autonomous engineering layer on top.",
+    title: "Vibe coders",
+    body: "AI builds the app; Prody handles the five checks, the cloud, and the cleanup.",
   },
 ];
 
@@ -20,7 +20,7 @@ export function UseCases() {
     <Section variant="white">
       <SectionHeading
         label="Built for"
-        title="Teams that build fast and need to ship safely"
+        title="Builders who ship fast and need to stay safe"
       />
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">

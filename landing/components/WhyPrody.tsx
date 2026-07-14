@@ -2,24 +2,24 @@ import { FilterChip, Section, SectionHeading } from "./ui";
 
 const pillars = [
   {
-    title: "Works where you code",
-    body: "Start in your IDE or paste a GitHub link. Same engine, same session, no context switching.",
-    chip: "IDE + Web",
+    title: "Three surfaces, one brain",
+    body: "IDE, dashboard, and CLI share the same orchestrator and deployment registry. Start anywhere; manage everywhere.",
+    chip: "IDE + Web + CLI",
   },
   {
-    title: "Private by default",
-    body: "Security scans run on your machine. Sensitive code never leaves your environment unless you deploy.",
-    chip: "On-device",
+    title: "Your models, your choice",
+    body: "Ollama for local privacy, OpenRouter for flexibility, Gemini for full managed deploy. Configure per role.",
+    chip: "BYOM",
   },
   {
     title: "Real infrastructure",
-    body: "Actual cloud provisioning and deploys, not mockups. Prody executes, explains, and asks before critical actions.",
-    chip: "Production",
+    body: "Actual cloud provisioning on GCP, AWS, or Azure — not mockups. Prody executes, explains, and asks before critical actions.",
+    chip: "Multi-cloud",
   },
   {
-    title: "Always watching",
-    body: "After deploy, Prody monitors health and scales on traffic in your cloud project, autonomously.",
-    chip: "24/7 ops",
+    title: "Fail-closed security",
+    body: "Five checks before launch. No deploy on critical findings. Fix guides your agent can implement, not vague warnings.",
+    chip: "5 checks",
   },
 ];
 
@@ -28,8 +28,8 @@ export function WhyPrody() {
     <Section id="why-prody" variant="stone">
       <SectionHeading
         label="Why Prody"
-        title="Help when you need it, not another tool to learn"
-        description="Prody doesn't dump dashboards on you. It does the work, explains what happened, and asks before anything critical."
+        title="Help when you need it, not another dashboard to learn"
+        description="Prody does the engineering work, explains in plain language, and syncs every deploy to a registry you control."
       />
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2">

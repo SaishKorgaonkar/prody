@@ -1,10 +1,36 @@
-import { DASHBOARD_URL } from "@/lib/config";
-
 const columns = [
-  { title: "Product", links: [{ l: "The flow", h: "#flow" }, { l: "How it works", h: "#how-it-works" }, { l: "Agents", h: "#agents" }] },
-  { title: "Developers", links: [{ l: "Connect Extension", h: "#extension" }, { l: "Open Dashboard", h: DASHBOARD_URL }, { l: "Why Prody", h: "#why-prody" }] },
-  { title: "Company", links: [{ l: "About", h: "#" }, { l: "Contact", h: "#" }] },
-  { title: "Legal", links: [{ l: "Privacy", h: "#" }, { l: "Terms", h: "#" }] },
+  {
+    title: "Product",
+    links: [
+      { l: "Security checks", h: "#security" },
+      { l: "Multi-cloud", h: "#clouds" },
+      { l: "Three surfaces", h: "#surfaces" },
+      { l: "The flow", h: "#flow" },
+    ],
+  },
+  {
+    title: "Developers",
+    links: [
+      { l: "How it works", h: "#how-it-works" },
+      { l: "Agent team", h: "#agents" },
+      { l: "Models", h: "#models" },
+      { l: "Early access", h: "#early-access" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { l: "About", h: "#why-prody" },
+      { l: "Contact", h: "#early-access" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { l: "Privacy", h: "#" },
+      { l: "Terms", h: "#" },
+    ],
+  },
 ];
 
 export function Footer() {
@@ -15,10 +41,11 @@ export function Footer() {
           <p className="font-display text-[28px] tracking-[-0.5px] md:text-[32px]">
             Prody
           </p>
-          <p className="mt-3 max-w-[400px] text-[15px] leading-[1.5] text-white/65">
-            The autonomous layer between your code and production. Security, deploy, and ops in one flow.
+          <p className="mt-3 max-w-[440px] text-[15px] leading-[1.5] text-white/65">
+            The autonomous engineering layer between your code and production.
+            Secure, deploy, and manage on any cloud.
           </p>
-          <p className="mt-4 max-w-[400px] text-[12px] leading-[1.4] text-white/45">
+          <p className="mt-4 max-w-[440px] text-[12px] leading-[1.4] text-white/45">
             By using Prody you agree to our Privacy Policy and Terms of Service.
           </p>
         </div>
@@ -45,7 +72,9 @@ export function Footer() {
           ))}
         </div>
 
-        <p className="mt-12 text-[12px] text-white/45">© 2026 Prody. All rights reserved.</p>
+        <p className="mt-12 text-[12px] text-white/45">
+          © 2026 Prody. All rights reserved.
+        </p>
       </div>
     </footer>
   );
