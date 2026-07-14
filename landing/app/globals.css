@@ -27,6 +27,7 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -36,6 +37,54 @@ body {
     "Segoe UI", helvetica, arial, sans-serif;
   font-weight: 500;
   line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.pipeline-scroll {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.pipeline-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Text overlay gradients — video full bleed behind copy */
+.hero-video-fade {
+  background: linear-gradient(
+    180deg,
+    rgba(9, 9, 11, 0.92) 0%,
+    rgba(9, 9, 11, 0.78) 42%,
+    rgba(9, 9, 11, 0.45) 68%,
+    rgba(9, 9, 11, 0.2) 100%
+  );
+}
+
+@media (min-width: 1024px) {
+  .hero-video-fade {
+    background: linear-gradient(
+      to right,
+      #09090b 0%,
+      #09090b 28%,
+      rgba(9, 9, 11, 0.94) 38%,
+      rgba(9, 9, 11, 0.82) 46%,
+      rgba(9, 9, 11, 0.58) 56%,
+      rgba(9, 9, 11, 0.28) 66%,
+      rgba(9, 9, 11, 0.08) 76%,
+      transparent 88%
+    );
+  }
+}
+
+.hero-video-object {
+  object-position: 55% center;
+}
+
+@media (min-width: 1024px) {
+  .hero-video-object {
+    object-position: 52% center;
+  }
 }
 
 .font-mono-label {
@@ -98,4 +147,43 @@ h3 {
   font-family: var(--hashicorp-sans), -apple-system, BlinkMacSystemFont,
     "Segoe UI", helvetica, arial, sans-serif;
   font-weight: 600;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes feature-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feature-panel-enter {
+  animation: feature-panel-in 0.35s ease-out;
+}
+
+.bento-tile {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .bento-tile:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--coral) 35%, var(--hairline));
+  }
 }

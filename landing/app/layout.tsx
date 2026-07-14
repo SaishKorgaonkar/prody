@@ -3,13 +3,13 @@ import { hashicorpSans } from "@hashicorp/mds-next/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Prody | Stuck here? We're here to help",
+  title: "Prody | Ship secure apps to any cloud",
   description:
-    "Introducing Prody. You built the app; we help you ship it. Security, deploy, and ops from your IDE or a GitHub link.",
+    "Five security checks, multi-cloud deploy, and one deployment registry. Ship from your IDE, dashboard, or terminal.",
   openGraph: {
-    title: "Introducing Prody",
+    title: "Prody | Ship secure apps to any cloud",
     description:
-      "Stuck on the last mile? Prody helps you get from code to production.",
+      "Five security checks, multi-cloud deploy, and one deployment registry.",
   },
 };
 

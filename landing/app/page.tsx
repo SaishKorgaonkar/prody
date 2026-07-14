@@ -13,7 +13,6 @@ import { Problem } from "@/components/Problem";
 import { UseCases } from "@/components/UseCases";
 import { WhyPrody } from "@/components/WhyPrody";
 import { EarlyAccess } from "@/components/EarlyAccess";
-import { CTABanner } from "@/components/CTABanner";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
@@ -37,7 +36,6 @@ export default function Home() {
         <UseCases />
         <WhyPrody />
         <EarlyAccess />
-        <CTABanner />
       </main>
       <Footer />
     </>

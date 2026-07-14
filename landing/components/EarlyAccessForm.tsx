@@ -103,7 +103,7 @@ export function EarlyAccessForm({
             disabled={status === "loading"}
             className={`w-full rounded-full border px-5 py-3 text-[14px] outline-none transition-colors ${inputClass}`}
           >
-            <option value="">I am a…</option>
+            <option value="">Role</option>
             <option value="solo_dev">Solo developer</option>
             <option value="founder">Founder</option>
             <option value="team">Engineering team</option>
@@ -127,7 +127,7 @@ export function EarlyAccessForm({
           isDark ? "text-white/40" : "text-ink-muted"
         }`}
       >
-        Be first to ship with Prody. No spam — early access only.
+        Early access updates only. No spam.
       </p>
     </form>
   );

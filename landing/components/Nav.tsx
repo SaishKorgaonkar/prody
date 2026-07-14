@@ -25,7 +25,7 @@ export function Nav({ dark = false }: { dark?: boolean }) {
           Prody
         </a>
 
-        <nav className="hidden items-center justify-center gap-5 lg:flex lg:gap-7">
+        <nav className="hidden items-center justify-center gap-4 md:flex md:gap-5 lg:gap-7">
           {links.map((link) => (
             <a
               key={link.href}

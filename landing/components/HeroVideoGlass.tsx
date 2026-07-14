@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-export function HeroVideoGlass({ mobile = false }: { mobile?: boolean }) {
+export function HeroVideoGlass() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -24,29 +24,19 @@ export function HeroVideoGlass({ mobile = false }: { mobile?: boolean }) {
   }, []);
 
   return (
-    <div
-      className={`relative h-full w-full overflow-hidden ${mobile ? "rounded-2xl" : ""}`}
-    >
+    <div className="absolute inset-0">
       <video
         ref={videoRef}
         src="/hero-loop.mp4?v=2"
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        className="hero-video-object absolute inset-0 z-0 h-full w-full object-cover saturate-[1.08] contrast-[1.04]"
         autoPlay
         loop
         muted
         playsInline
         preload="auto"
+        aria-hidden
       />
-
-      <div className="hero-visual-grid-dark pointer-events-none absolute inset-0 opacity-[0.35]" />
-
-      <div className="pointer-events-none absolute inset-0 bg-black/35" />
-      <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-r from-[#09090b] via-[#09090b]/55 to-transparent ${
-          mobile ? "from-20% via-[#09090b]/40 to-45%" : "from-0% via-[#09090b]/65 via-30% to-55%"
-        }`}
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#09090b]/50 via-transparent to-[#09090b]/20" />
+      <div className="hero-visual-grid-dark pointer-events-none absolute inset-0 z-[1] opacity-[0.22]" />
     </div>
   );
 }

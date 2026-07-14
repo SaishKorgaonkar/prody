@@ -7,7 +7,7 @@ const steps = [
   {
     id: "security",
     label: "5 checks",
-    detail: "Secrets → attacker review",
+    detail: "Secrets to attacker review",
   },
   {
     id: "fix",
@@ -27,33 +27,33 @@ const steps = [
   {
     id: "deploy",
     label: "Deploy",
-    detail: "GCP · AWS · Azure",
+    detail: "GCP, AWS, Azure",
   },
 ];
 
 export function ProductFlowStrip() {
   return (
     <div className="relative z-10 border-t border-white/10 bg-[#09090b]/80 backdrop-blur-sm">
-      <div className="mx-auto max-w-[1280px] px-6 py-8 sm:px-8 md:px-10 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6 sm:py-8 md:px-10 lg:px-16">
         <p className="font-mono-label text-[11px] uppercase tracking-wider text-white/40">
           The pipeline
         </p>
-        <ol className="mt-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-2 lg:gap-0">
+        <ol className="pipeline-scroll mt-4 flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:pb-0 lg:flex lg:flex-row lg:items-start lg:gap-2">
           {steps.map((step, i) => (
             <li
               key={step.id}
-              className="flex min-w-0 flex-1 items-start gap-2 lg:items-center"
+              className="flex w-[min(72vw,240px)] shrink-0 snap-start flex-col sm:w-auto sm:min-w-0 sm:flex-1 lg:flex-row lg:items-center"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[11px] font-semibold text-white/80">
                     {i + 1}
                   </span>
-                  <span className="text-[14px] font-semibold text-white sm:text-[15px]">
+                  <span className="text-[13px] font-semibold text-white sm:text-[14px] lg:text-[15px]">
                     {step.label}
                   </span>
                 </div>
-                <p className="mt-1 pl-8 text-[12px] leading-snug text-white/45 sm:mt-0.5 lg:pl-8 lg:mt-1">
+                <p className="mt-1 pl-8 text-[11px] leading-snug text-white/45 sm:text-[12px]">
                   {step.detail}
                 </p>
               </div>

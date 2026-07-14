@@ -10,12 +10,10 @@ export function EarlyAccess() {
             Early access
           </p>
           <h2 className="font-display mt-4 text-[32px] leading-[1.12] tracking-[-0.48px] text-ink md:text-[40px]">
-            Ship to production without the ops team
+            Join early access
           </h2>
           <p className="mt-4 text-[16px] leading-relaxed text-ink-muted">
-            Prody runs five security checks, deploys to GCP AWS or Azure, and
-            keeps every deployment in one registry — from your IDE, dashboard, or
-            terminal. Join for early access.
+            Get notified when Prody opens to new teams.
           </p>
         </div>
         <div className="mx-auto mt-8 max-w-[560px]">

@@ -42,8 +42,8 @@ export function Footer() {
             Prody
           </p>
           <p className="mt-3 max-w-[440px] text-[15px] leading-[1.5] text-white/65">
-            The autonomous engineering layer between your code and production.
-            Secure, deploy, and manage on any cloud.
+            Secure, deploy, and manage on any cloud. From your IDE, dashboard,
+            or terminal.
           </p>
           <p className="mt-4 max-w-[440px] text-[12px] leading-[1.4] text-white/45">
             By using Prody you agree to our Privacy Policy and Terms of Service.
